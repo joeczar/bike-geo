@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where each frame puts you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Narrow:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#12161a; --panel:#171c21; --panel2:#1b2126; --rule:#262e35;
+         --fg:#e7ecf0; --mute:#8b98a4; --up:#6fa8dc; --low:#e0b341; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--fg);
+    font-family:'Archivo',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 16px 72px}
+  .eyebrow{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.18em;font-size:11px;color:var(--mute);margin:0}
+  h1{font-weight:800;font-size:clamp(25px,6vw,40px);line-height:1.03;letter-spacing:-.02em;margin:10px 0 14px}
+  .lede{max-width:64ch;color:#b9c4cd;font-size:15px;line-height:1.55;margin:0 0 26px}
+  h2{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.16em;
+    font-size:12px;color:var(--mute);margin:38px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  .panel{border:1px solid var(--rule);background:var(--panel);border-radius:2px;padding:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:14px;margin:12px 0 0}
+  .m{border-left:2px solid #2f3a43;padding-left:10px}
+  .m dt{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+    font-size:10.5px;color:var(--mute);margin:0 0 3px}
+  .m dd{margin:0;font-family:'JetBrains Mono',monospace;font-size:17px}
+  .inputs{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;border-top:1px solid var(--rule);
+    padding-top:14px;margin-top:16px}
+  label{display:block;font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.08em;font-size:10.5px;color:var(--mute);margin-bottom:5px}
+  input[type=number],select{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--fg);
+    background:var(--ink);border:1px solid var(--rule);border-radius:2px;padding:7px 8px;width:88px}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid #6fa8dc;outline-offset:2px}
+
+  .find{width:100%;max-width:320px;margin:0 0 14px;font-family:'Archivo Narrow',sans-serif;
+    font-size:13px;letter-spacing:.04em}
+  .chips{display:flex;flex-direction:column;gap:9px;margin:0 0 16px}
+  .brand{display:grid;grid-template-columns:82px 1fr;align-items:start;gap:8px}
+  .brand[hidden]{display:none}
+  .brandChips{display:flex;flex-wrap:wrap;gap:8px}
+  .brandName{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;line-height:33px;
+    letter-spacing:.1em;text-transform:uppercase;color:#6b7783;text-align:right}
+  @media (max-width:640px){ .brand{grid-template-columns:1fr} .brandName{text-align:left;line-height:1.6} }
+  .chip{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:2px;padding:8px 11px;cursor:pointer;font-size:13px;color:var(--mute);
+    font-family:'Archivo Narrow',sans-serif;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .chip .dot{width:10px;height:10px;border-radius:50%;flex:none;opacity:.28}
+  .chip[aria-pressed="true"]{color:var(--fg);border-color:#3c4750;background:var(--panel2)}
+  .chip[aria-pressed="true"] .dot{opacity:1}
+  button{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--fg);background:transparent;border:1px solid var(--rule);
+    border-radius:2px;padding:7px 11px;cursor:pointer}
+  button[aria-pressed="false"]{color:var(--mute)}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+
+  figure{margin:0 0 10px;border:1px solid var(--rule);background:var(--panel);border-radius:2px;padding:6px}
+  svg{display:block;width:100%;height:auto}
+  figcaption{padding:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--mute);line-height:1.5}
+
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;min-width:680px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap;
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;font-variant-numeric:tabular-nums}
+  th{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+    font-size:10.5px;color:var(--mute)}
+  td.name,th.name{text-align:left;font-family:'Archivo',sans-serif;font-size:13px;position:sticky;left:0;background:var(--ink)}
+  td.name{display:flex;align-items:center;gap:8px}
+  .swatch{width:3px;height:15px;flex:none}
+  tbody tr:hover td,tbody tr:hover td.name{background:var(--panel2)}
+  tr.datum td{color:var(--mute);border-bottom:1px solid #39434c}
+  tr.datum td.name{color:var(--fg)}
+  .up{color:var(--up)} .low{color:var(--low)}
+  ul{padding-left:18px;margin:0}
+  li{margin:0 0 11px;font-size:14px;line-height:1.55;color:#b9c4cd;max-width:70ch}
+  li b{color:var(--fg);font-weight:600}
+  .note{font-size:12px;color:var(--mute);line-height:1.65;margin-top:24px;max-width:72ch}
+  .note b{color:#b9c4cd}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Same cockpit, different frames · aligned at the bottom bracket</p>
+  <h1>Where each frame puts you</h1>
+  <p class="lede">Fit the same stem and spacer stack to every frame and the bars land somewhere different. That difference <em>is</em> the ride position: how upright you sit, how far the reach stretches, how much drop you get. Your fit report is the datum to measure from, not a bar every frame has to clear.</p>
+
+  <section class="panel">
+    <p class="eyebrow">Datum · your position from the Fairlight report, 9 Jan 2026</p>
+    <dl class="grid">
+      <div class="m"><dt>Saddle top</dt><dd>743</dd></div>
+      <div class="m"><dt>Bar top</dt><dd>663</dd></div>
+      <div class="m"><dt>Bar reach</dt><dd>489</dd></div>
+      <div class="m"><dt>Drop</dt><dd>80</dd></div>
+      <div class="m"><dt>Saddle → bar</dt><dd>545</dd></div>
+    </dl>
+    <div class="inputs">
+      <div><label for="rise">Spacers (mm)</label><input id="rise" type="number" value="35" step="5"></div>
+      <div><label for="oh">Headset + clamp</label><input id="oh" type="number" value="30" step="1"></div>
+      <div><label for="stem">Stem (mm)</label><input id="stem" type="number" value="90" step="10"></div>
+      <div><label for="sa">Stem angle</label>
+        <select id="sa"><option value="0">0°</option><option value="-6">−6°</option>
+        <option value="-12">−12°</option><option value="-17">−17°</option><option value="6" selected>+6°</option></select></div>
+      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="743" step="1"></div>
+      <div><label for="apr">Aero pad rise</label><input id="apr" type="number" value="45" step="5"></div>
+      <div><label for="aex">Aero extension</label><input id="aex" type="number" value="200" step="10"></div>
+      <div><label for="atl">Extension tilt</label><input id="atl" type="number" value="10" step="5"></div>
+    </div>
+  </section>
+
+  <h2>Frames</h2>
+  <input id="find" class="find" type="search" placeholder="Filter by maker or model…" aria-label="Filter frames">
+  <div class="chips" id="chips"></div>
+  <div class="bar">
+    <button id="allBtn">All on</button>
+    <button id="noneBtn">All off</button>
+    <button id="endBtn">Endurance shortlist</button>
+    <button id="lBtn">Tourers</button>
+    <button id="sfBtn">Sklar vs Faran</button>
+    <button id="wheelBtn" aria-pressed="false">Wheels</button>
+    <button id="aeroBtn" aria-pressed="false">Aero bars</button>
+  </div>
+
+  <figure>
+    <svg id="plot" role="img" aria-label="Side-view overlay of the selected frames with the same cockpit fitted to each."></svg>
+    <figcaption id="cap"></figcaption>
+  </figure>
+
+  <h2>Resulting position</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="name">Frame</th><th>Bar top</th><th>Bar reach</th><th>Drop</th>
+        <th>Saddle → bar</th><th>Axle ahead of hands</th><th>vs datum</th><th>Post out</th></tr></thead>
+      <tbody id="fitRows"></tbody>
+    </table>
+  </div>
+  <p class="note">Same spacers, stem and angle on every frame, so the numbers isolate what the frame itself does. <b>Drop</b> is saddle top to bar top; a smaller number is a more upright bike. Nothing here is a pass or a fail.
+  <br><br>
+  <b>The 30 mm overhead is calibrated, not guessed.</b> Zero spacers still leaves the stem clamp well above the head tube: headset top cup plus half the clamp height. Take Fairlight's two builds exactly as they specced them — 110 mm stem on 15 mm of spacers for the 56R, 100 mm on none for the 58R — and ask what overhead reproduces the bar coordinates their own report says those builds achieve. The answer is 36.7 mm and 36.8 mm: the same constant twice, a tenth of a millimetre apart, and exactly what a Faran's 17 mm Hope Cup 1 plus a stem clamp accounts for. Frames with a low-stack headset cup (8 mm rather than 17) sit nearer 27 mm, so 30 is the default here. Adjust it and everything recomputes.</p>
+
+  <h2 id="aeroHead" hidden>On the extensions</h2>
+  <div class="scroll" id="aeroWrap" hidden>
+    <table>
+      <thead><tr><th class="name">Frame</th><th>Pad top</th><th>Pad reach</th><th>Pad drop</th>
+        <th>Hands reach</th><th>Hands drop</th><th>Hands vs datum</th></tr></thead>
+      <tbody id="aeroRows"></tbody>
+    </table>
+  </div>
+  <p class="note" id="aeroNote" hidden>The same clip-ons on every frame, mounted at the bar clamp: pads sitting <span id="aprEcho">45</span> mm above the bar top, hands <span id="aexEcho">200</span> mm out along extensions tilted <span id="atlEcho">10</span>° up. <b>Drop</b> is still saddle top to hands, so a negative number means the extensions sit above the saddle. Nothing here is a pass or a fail either — a bikepacking bar sitting above the saddle with the extensions bringing you back level with it is a normal, useful setup.
+  <br><br>
+  One simplification worth knowing: the pads are modelled straight above the bar clamp centre, where real clip-ons place them anywhere from 20 mm behind that to 20 mm ahead — and armrest position is the first thing anyone adjusts. That moves the hands more than the frame differences here do, so read these as a starting position, not a fitted one.
+  <br><br>
+  Where it earns its keep is a frame whose grips land high and short. On the PBJ with Sklar's own 35 mm stem the bar clamp is near your datum reach but 30 mm higher, and the bar's 28° of backsweep and −112 mm reach pull the grips about 100 mm further back again. Clip-ons put that extension back without touching the frame — which is why long front centres and aero bars turn up on the same bikes.</p>
+
+  <h2>Geometry</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="name">Frame</th><th>Stack</th><th>Reach</th><th>S:R</th><th>ETT</th><th>Seat tube</th>
+        <th>HTA</th><th>STA</th><th>Chainstay</th><th>Wheelbase</th><th>Trail</th><th>BB drop</th><th>Standover</th></tr></thead>
+      <tbody id="geoRows"></tbody>
+    </table>
+  </div>
+
+  <h2>Reading</h2>
+  <ul id="findings"></ul>
+
+  <p class="note">
+    <b>** Bombtrack Hook EXT L.</b> These are the Hook EXT <em>titanium</em> figures on 27.5" wheels, from Bombtrack's own chart. Their site blocks automated access, so I couldn't pull the steel 700C Hook's chart — the platform is shared but the steel 700C version will differ, most likely in BB drop and stack. Treat this row as the Hook family's shape, not the exact frame.
+    <br><br>
+    <b>ROSE Backroad CF L.</b> No longer a stand-in: the whole row is the current-generation chart, including Rose's published 48 mm fork offset, and closing their wheelbase against it lands on 48.3 — so nothing here is derived. This replaced an earlier row that carried the previous generation's angles, seat tube, head tube and chainstay, which had the head angle half a degree steep and the offset 8 mm short, and so understated the trail. Rose have a Hamburg store.
+    <br><br>
+    <b>† Sklar PBJ.</b> Sklar's own chart, so stack, reach, angles and the 52 mm offset are published rather than derived. Standover isn't in the chart, so it's blank rather than guessed. Two of their own numbers disagree, though: closing the published <em>wheelbase</em> would want 63 mm of offset on the M and 56 on the L, but closing the published <em>front centre</em> — 730 on the M, 755 on the L — gives 52.1 and 53.2 against their stated 52. The front centre is the number that fits, so the front wheel here is placed from it, which makes the wheelbase in the table 1153 and 1179 rather than the 1165 and 1182 Sklar print.
+    <br><br>
+    The stem is the thing to hold in mind when reading its bar position. Sklar design the PBJ around a <b>30–50 mm stem</b> and ship complete builds with a 35, paired with their swept-back riser bar, which pulls the hands back again. This page fits a 90 mm stem to every frame, so the PBJ's bar is drawn something like 55 mm further forward than Sklar intend, before any bar sweep. They also say outright that a drop bar on a PBJ is possible but hard to fit well, and point drop-bar riders at the SuperSomething instead. It's a rigid 29er on a 29 × 2.6 reference tyre.
+    <br><br>
+    Sklar size by the same two numbers this page is built on. For a 775 mm saddle height and a 545 mm saddle-to-bar, their chart puts you on the <b>L</b> — saddle height 730–790, saddle to stem 530–570, so 545 sits mid-window — and the M is outside both ranges. Their SuperSomething chart says the same: L is 730–795, the M-L tops out at 750. Sklar measure saddle <em>tip</em> to stem centre where the fit report measures saddle to bar, so treat that as close, not identical.
+    <br><br>
+    <b>‡ Standert.</b> Both charts are Standert's own, and both stop short of the two numbers this page needs for the front wheel: neither prints BB drop, and only the Erdgeschoss prints an offset. The Erdgeschoss fork is a Columbus Cross+ with a rake you choose at 47 or 52 mm; closing the published wheelbase against the 52 mm setting wants 75 mm of BB drop, and that same 75 reproduces 52.0 mm on the 58 and 51.5 on the 60 — consistent enough to trust, and the ordinary figure for a gravel frame. Its 425 mm chainstay is the shortest position of a sliding dropout. The Kreissäge RS prints neither, so 70 mm of drop is assumed as the road standard, which then derives 43.5–43.9 mm of offset — normal for a 73.5° race frame, but it is an assumption, not a published figure. Drawn on a 32 mm reference tyre against a 35 mm maximum, where the Erdgeschoss gets the 45 mm everything else here uses.
+    <br><br>
+    <b>§ Otso Fenrir Stainless.</b> Otso's own chart, but every number that touches the wheels is a <em>range</em>, because the Tuning Chip dropout moves the rear axle: 430–450 mm chainstay, 68–72 mm BB drop, 1150–1170 mm wheelbase, ±0.25° on both angles. The row here is the middle setting — 440 mm chainstay, 70 mm drop — which closes the wheelbase at 1150 against Otso's published 51 mm offset. The stack assumes the 495 mm axle-to-crown rigid fork, suspension-corrected for a 120 mm fork, so it is not like-for-like at the head tube against the rigid gravel frames. It is a 29er on 2.35" rubber with a 68° head angle, and like the PBJ its reach is drawn for a much shorter stem than the 90 mm fitted to every frame here.
+    <br><br>
+    <b>Sources.</b> The Cinelli Tutto Plus reference row is Cinelli's own published chart, including their 45 mm fork rake and their 616 mm front centre — that front centre closes against the 45 mm rake to within a millimetre where their printed 1024 mm wheelbase would want 37 mm of rake, so the front wheel is placed from the front centre and the wheelbase shown is the derived 1034. 8bar, Canyon and Salsa's own charts; Stigmata via Santa Cruz through Bike Insights; CUBE's own chart for the Nuroad C:62, which prints no fork offset — closing its wheelbase derives 47 mm on both the L and the XL, and its effective top tube figures fall out of the stack, reach and 73° seat angle to the millimetre, so the chart is internally consistent. Salsa's Fargo stack assumes a 483 mm axle-to-crown fork, so it is a suspension-corrected figure. Fork offset is derived by closing each chart's own wheelbase, chainstay, BB drop and head angle — it reproduces the published offset within 1 mm where one exists, and supplies the Grizl figure Canyon doesn't print. Santa Cruz rider-height ranges aren't in the source data, so they're omitted rather than guessed.
+    <br><br>
+    <b>Rise</b> means height from the top of the head tube to the stem clamp along the steerer — spacers, headset cap, half the clamp. 20 mm is roughly a slammed drop-bar setup; add bar rise on top if you run a riser.
+  </p>
+</div>
+
+<script>
+const rad = d => d*Math.PI/180;
+const BAR_TOP = 15;
+
+const BIKES = [
+  /* The reference bike, drawn as it is actually set up: 35 mm of spacers below
+     the stem — measured off a photo, then confirmed by Joe, Aug 2026 — and the
+     stem flipped up. The thinnest 2.5 mm spacer sits above the stem and raises
+     nothing, so it is not counted. Every other frame gets the shared cockpit. */
+  { id:'tutto', brand:'Cinelli',  name:'Cinelli Tutto Plus L', ref:true, color:'#f2f5f7', on:true,
+    stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
+    standover:null, tire:692, rake:45, cockpit:{ spacers:35, angle:6, stem:80 } },
+  { id:'tfl510', brand:'8bar', name:'8bar TFLSBERG M (510)', color:'#3ecfc2', on:false,
+    stack:613, reach:389, ett:570, st:510, ht:180, hta:70, sta:73.5, drop:75, cs:440, wb:1071,
+    standover:825, tire:736.3 },
+  { id:'tfl540', brand:'8bar', name:'8bar TFLSBERG L (540)', color:'#2a9d94', on:false,
+    stack:631, reach:413, ett:600, st:540, ht:200, hta:70, sta:73.5, drop:75, cs:440, wb:1103,
+    standover:855, tire:736.3 },
+  { id:'fargoM', brand:'Salsa', name:'Salsa Fargo M', color:'#e66a33', on:false,
+    stack:633, reach:371, ett:565, st:457.2, ht:140, hta:69, sta:73, drop:70, cs:462, wb:1099,
+    standover:778, tire:746 },
+  { id:'fargoL', brand:'Salsa', name:'Salsa Fargo L', color:'#b34a1c', on:false,
+    stack:661, reach:388, ett:590, st:508, ht:170, hta:69, sta:73, drop:70, cs:462, wb:1126,
+    standover:821, tire:746 },
+  { id:'stigM', brand:'Santa Cruz',  name:'Stigmata 4 M', color:'#d9c2ff', on:false,
+    stack:576, reach:405, ett:null, st:485, ht:120, hta:69.5, sta:74, drop:76, cs:423, wb:1063,
+    standover:753, tire:712 },
+  { id:'stigL', brand:'Santa Cruz',  name:'Stigmata 4 L', color:'#b48cf2', on:true,
+    stack:600, reach:420, ett:null, st:515, ht:145, hta:69.5, sta:74, drop:76, cs:423, wb:1087,
+    standover:778, tire:712 },
+  { id:'stigXL', brand:'Santa Cruz', name:'Stigmata 4 XL', color:'#7c5bc9', on:false,
+    stack:612, reach:435, ett:null, st:545, ht:160, hta:69.5, sta:74, drop:74, cs:423, wb:1108,
+    standover:804, tire:712 },
+  { id:'faran56', brand:'Fairlight', name:'Fairlight Faran 3.0 56R', color:'#e8e2c8', on:true,
+    stack:576, reach:396, ett:567, st:549, ht:131, hta:72, sta:73.5, drop:75, cs:432, wb:1047,
+    standover:808, tire:712, rake:60 },
+  { id:'faran58', brand:'Fairlight', name:'Fairlight Faran 3.0 58R', color:'#c4bb92', on:true,
+    stack:594, reach:404, ett:580, st:567, ht:148, hta:72.5, sta:73.5, drop:75, cs:432, wb:1056,
+    standover:825, tire:712, rake:60 },
+  { id:'grunL', brand:'8bar',  name:'8bar GRUNEWALD Steel L', color:'#9ae66e', on:true,
+    stack:601, reach:407, ett:580, st:540, ht:170, hta:72, sta:74, drop:72, cs:430, wb:1050,
+    standover:790, tire:712 },
+  { id:'grunXL', brand:'8bar', name:'8bar GRUNEWALD Steel XL', color:'#6cae4a', on:false,
+    stack:620, reach:427, ett:605, st:570, ht:190, hta:72, sta:74, drop:72, cs:430, wb:1076,
+    standover:810, tire:712 },
+  { id:'mitteL', brand:'8bar', name:'8bar MITTE Alu V4 L', color:'#f2a2c0', on:false,
+    stack:606, reach:394, ett:580, st:570, ht:180, hta:72, sta:73, drop:73, cs:430, wb:1048,
+    standover:805, tire:712 },
+  { id:'backL', brand:'ROSE',  name:'ROSE Backroad CF L', color:'#6fa8dc', on:true,
+    stack:610.5, reach:412, ett:590, st:531, ht:167, hta:71.5, sta:73.75, drop:78, cs:430, wb:1064,
+    standover:837, tire:712, rake:48 },
+  { id:'terrelM', brand:'Propain', name:'Propain Terrel CF M', color:'#ef7fb0', on:true,
+    stack:583, reach:405, ett:578, st:525, ht:130, hta:70.5, sta:73.5, drop:72, cs:435, wb:1062,
+    standover:820, tire:712, rake:45 },
+  { id:'terrelL', brand:'Propain', name:'Propain Terrel CF L', color:'#e05a8a', on:true,
+    stack:608, reach:412, ett:592, st:545, ht:154, hta:71, sta:73.5, drop:72, cs:435, wb:1073,
+    standover:843, tire:712, rake:45 },
+  { id:'terrelXL', brand:'Propain', name:'Propain Terrel CF XL', color:'#a03a62', on:false,
+    stack:632, reach:430, ett:617, st:570, ht:177, hta:71.5, sta:73.5, drop:72, cs:435, wb:1094,
+    standover:862, tire:712, rake:45 },
+  { id:'sklarML', brand:'Sklar', name:'Sklar SuperSomething M/L', color:'#8fbfd9', on:false,
+    stack:607, reach:386, ett:566, st:538, ht:166, hta:70.5, sta:73.5, drop:73, cs:426, wb:1058,
+    standover:822, tire:718, rake:55 },
+  { id:'sklarLG', brand:'Sklar', name:'Sklar SuperSomething LG', color:'#4f8fb5', on:true,
+    stack:629, reach:406, ett:592, st:575, ht:187, hta:70.5, sta:73.5, drop:73, cs:426, wb:1085,
+    standover:850, tire:718, rake:55 },
+  { id:'pbjM', brand:'Sklar',   name:'Sklar PBJ M †', color:'#ff6b6b', on:false,
+    stack:615, reach:461, ett:637, st:440, ht:110, hta:69, sta:74, drop:68, cs:432, fc:730,
+    standover:null, tire:754, rake:52 },
+  { id:'pbjL', brand:'Sklar',   name:'Sklar PBJ L †', color:'#c4302b', on:true,
+    stack:641, reach:475, ett:659, st:505, ht:140, hta:69, sta:74, drop:68, cs:432, fc:755,
+    standover:null, tire:754, rake:52 },
+  { id:'hookL', brand:'Bombtrack', name:'Bombtrack Hook EXT L **', color:'#d98f5a', on:true,
+    stack:612, reach:390, ett:572, st:570, ht:170, hta:71.5, sta:73.5, drop:66, cs:425, wb:1049,
+    standover:834, tire:700, rake:53 },
+  { id:'grizlL', brand:'Canyon', name:'Canyon Grizl CF L', color:'#ffd166', on:true,
+    stack:605, reach:409, ett:578, st:552, ht:164, hta:72.5, sta:73.5, drop:75, cs:435, wb:1050,
+    standover:845, tire:712 },
+  { id:'grizlXL', brand:'Canyon',name:'Canyon Grizl CF XL', color:'#c99b1e', on:false,
+    stack:626, reach:427, ett:602, st:582, ht:185, hta:72.75, sta:73.5, drop:75, cs:435, wb:1072,
+    standover:870, tire:712 },
+  { id:'nuroadL', brand:'CUBE', name:'CUBE Nuroad C:62 L (58)', color:'#e3f24a', on:true,
+    stack:599, reach:392, ett:575, st:510, ht:174, hta:72, sta:73, drop:70, cs:440, wb:1048,
+    standover:824, tire:712 },
+  { id:'nuroadXL', brand:'CUBE', name:'CUBE Nuroad C:62 XL (61)', color:'#a8b82e', on:false,
+    stack:623, reach:402, ett:592, st:540, ht:197, hta:72.5, sta:73, drop:70, cs:440, wb:1060,
+    standover:851, tire:712 },
+  { id:'urs01L', brand:'BMC', name:'BMC URS 01 L', color:'#ff8c1a', on:true,
+    stack:603, reach:419, ett:591, st:492, ht:172, hta:70, sta:74, drop:69, cs:425, fc:665,
+    standover:null, tire:712, rake:45 },
+  { id:'urs01M', brand:'BMC', name:'BMC URS 01 M', color:'#c06400', on:false,
+    stack:569, reach:415, ett:578, st:459, ht:146, hta:70, sta:74, drop:69, cs:425, fc:648,
+    standover:null, tire:712, rake:45 },
+  { id:'erd58', brand:'Standert',  name:'Standert Erdgeschoss 58 ‡', color:'#c3ccd4', on:true,
+    stack:589, reach:394, ett:575, st:560, ht:160, hta:72, sta:73, drop:75, cs:425, wb:1034,
+    standover:826, tire:712, rake:52 },
+  { id:'erd60', brand:'Standert',  name:'Standert Erdgeschoss 60 ‡', color:'#8c99a4', on:false,
+    stack:610, reach:398, ett:585, st:580, ht:180, hta:72.5, sta:73, drop:75, cs:425, wb:1039,
+    standover:846, tire:712, rake:52 },
+  { id:'krs56', brand:'Standert',  name:'Standert Kreissäge RS 56 ‡', color:'#7d7bf5', on:false,
+    stack:565, reach:392, ett:559, st:500, ht:160, hta:73.5, sta:73.5, drop:70, cs:410, wb:988,
+    standover:774, tire:686 },
+  { id:'krs58', brand:'Standert',  name:'Standert Kreissäge RS 58 ‡', color:'#4b46b0', on:false,
+    stack:584, reach:399, ett:572, st:520, ht:180, hta:73.5, sta:73.5, drop:70, cs:410, wb:1001,
+    standover:794, tire:686 },
+  { id:'fenrirL', brand:'Otso', name:'Otso Fenrir Stainless L §', color:'#4dd2ff', on:true,
+    stack:642, reach:428, ett:600, st:490, ht:140, hta:68, sta:75, drop:70, cs:440, wb:1150,
+    standover:838, tire:741, rake:51 }
+];
+
+for (const b of BIKES){
+  b.R = b.tire/2;
+  b.bbh = b.R - b.drop;
+  b.rearX = -Math.sqrt(b.cs*b.cs - b.drop*b.drop);
+  /* fc = published front centre, BB to front axle straight-line. Where a maker
+     prints it, it beats their wheelbase: it closes against their own offset. */
+  if (b.fc != null){ b.frontX = Math.sqrt(b.fc*b.fc - b.drop*b.drop); b.wb = Math.round(b.frontX - b.rearX); }
+  else b.frontX = b.wb + b.rearX;
+  b.htTop = { x:b.reach, y:b.stack };
+  b.htBot = { x:b.reach + b.ht*Math.cos(rad(b.hta)), y:b.stack - b.ht*Math.sin(rad(b.hta)) };
+  b.stTop = { x:-b.st*Math.cos(rad(b.sta)), y:b.st*Math.sin(rad(b.sta)) };
+  b.sr = b.stack/b.reach;
+  if (b.ett == null) b.ett = b.reach + b.stack/Math.tan(rad(b.sta));
+  const v = { x:b.frontX - b.htBot.x, y:b.drop - b.htBot.y };
+  if (b.rake == null) b.offset = v.x*Math.sin(rad(b.hta)) + v.y*Math.cos(rad(b.hta));
+  else b.offset = b.rake;
+  b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
+}
+
+/* datum from the fit report */
+const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
+/* Defaults are Joe's own cockpit — 35 mm of spacers, stem flipped up — so every
+   frame is tried with the setup he actually rides. Keep these in step with the
+   value attributes on the inputs above. */
+let cock = { spacers:35, overhead:30, stem:90, angle:6 }, saddleY = 743, showWheels = false;
+/* clip-on aero bars, same set fitted to every frame: pads above the bar top,
+   hands forward of the pads and level with them */
+let aero = { rise:45, ext:200, tilt:10 }, showAero = false;
+const RISE = () => cock.spacers + cock.overhead;
+/* A frame may carry `cockpit` to override the shared one. Only the reference
+   bike does: it is drawn as Joe actually has it set up, not as a test fit. */
+const cockpitFor = b => Object.assign({}, cock, b.cockpit || {});
+
+function fit(b){
+  const c = cockpitFor(b);
+  const H = rad(b.hta), th = rad(90 - b.hta + c.angle);
+  const r = c.spacers + c.overhead;
+  const clamp = { x:b.reach - r*Math.cos(H), y:b.stack + r*Math.sin(H) };
+  const bar = { x:clamp.x + c.stem*Math.cos(th), y:clamp.y + c.stem*Math.sin(th) };
+  const barTop = bar.y + BAR_TOP;
+  const S = rad(b.sta);
+  const pad = { x:bar.x, y:barTop + aero.rise };
+  const T = rad(aero.tilt);
+  const ext = { x:pad.x + aero.ext*Math.cos(T), y:pad.y + aero.ext*Math.sin(T) };
+  return {
+    clamp, bar, barTop, pad, ext,
+    padDrop: saddleY - pad.y,
+    extDrop: saddleY - ext.y,
+    drop: saddleY - barTop,
+    s2b: Math.hypot(bar.x - DATUM.saddleRefX, barTop - saddleY),
+    axis: { x:-saddleY/Math.tan(S), y:saddleY },
+    post: saddleY/Math.sin(S) - b.st
+  };
+}
+
+/* ---------- drawing ---------- */
+/* b leaves room for the trail figures under the ground line, stacked when
+   several frames land on top of each other */
+const PAD = { l:70, r:150, t:64, b:130 };
+const minX = Math.min(...BIKES.map(b=>b.rearX - b.R));
+const maxX = Math.max(...BIKES.map(b=>b.frontX + b.R));
+const minY = -Math.max(...BIKES.map(b=>b.bbh));
+const maxY = 800;
+const W = (maxX-minX) + PAD.l + PAD.r, H = (maxY-minY) + PAD.t + PAD.b;
+const X = x => (x - minX) + PAD.l, Y = y => (maxY - y) + PAD.t;
+const NS = 'http://www.w3.org/2000/svg';
+function el(t,a,x){const n=document.createElementNS(NS,t);for(const k in a)if(a[k]!=null)n.setAttribute(k,a[k]);
+  if(x!=null)n.textContent=x;return n;}
+function poly(p,pts,o={}){const n=el('polyline',Object.assign({
+  points:pts.map(q=>X(q.x).toFixed(1)+','+Y(q.y).toFixed(1)).join(' '),fill:'none',
+  'stroke-linecap':'round','stroke-linejoin':'round','vector-effect':'non-scaling-stroke'},o));
+  p.appendChild(n);return n;}
+const svg = document.getElementById('plot');
+
+function draw(){
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.innerHTML='';
+  const on = BIKES.filter(b=>b.on);
+
+  svg.appendChild(el('line',{x1:X(0),y1:Y(maxY),x2:X(0),y2:Y(minY),stroke:'#1e252b','stroke-width':1,
+    'stroke-dasharray':'2 8','vector-effect':'non-scaling-stroke'}));
+
+  // datum: saddle top and bar top heights from the fit report
+  for (const [y,label] of [[saddleY,'SADDLE TOP'],[DATUM.barTop,'DATUM BAR TOP · '+DATUM.drop+' MM DROP']]){
+    svg.appendChild(el('line',{x1:X(minX),y1:Y(y),x2:X(maxX),y2:Y(y),stroke:'#39434c','stroke-width':1,
+      'stroke-dasharray':'10 8','vector-effect':'non-scaling-stroke'}));
+    svg.appendChild(el('text',{x:X(minX)+6,y:Y(y)-12,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
+      'font-family':'Archivo Narrow, sans-serif','font-weight':700}, label));
+  }
+  svg.appendChild(el('circle',{cx:X(DATUM.barX),cy:Y(DATUM.barTop),r:13,fill:'none',stroke:'#e7ecf0',
+    'stroke-width':1.2,opacity:.8,'vector-effect':'non-scaling-stroke'}));
+
+  /* Frames that land close together would stamp their numbers on top of each
+     other — nudge each label down until it has room. */
+  const placed = [];
+  const labelY = (x,y) => { let ny = y;
+    for (let hit = true; hit; ) { hit = false;
+      for (const p of placed) if (Math.abs(p.x-x) < 150 && Math.abs(p.y-ny) < 22){ ny += 25; hit = true; break; } }
+    placed.push({x,y:ny}); return ny; };
+
+  for (const b of on){
+    const g = el('g',{}); svg.appendChild(g);
+    const w = b.ref ? 1.6 : 2.3, dash = b.ref ? '9 6' : null, f = fit(b);
+
+    if (showWheels) for (const ax of [{x:b.rearX,y:b.drop},{x:b.frontX,y:b.drop}])
+      g.appendChild(el('circle',{cx:X(ax.x),cy:Y(ax.y),r:b.R,stroke:b.color,fill:'none',
+        'stroke-width':1,opacity:.2,'vector-effect':'non-scaling-stroke'}));
+    g.appendChild(el('line',{x1:X(b.rearX-b.R),y1:Y(-b.bbh),x2:X(b.frontX+b.R),y2:Y(-b.bbh),
+      stroke:b.color,'stroke-width':1,opacity:.22,'stroke-dasharray':'14 10','vector-effect':'non-scaling-stroke'}));
+
+    poly(g,[b.stTop,b.htTop,b.htBot],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[b.htBot,{x:0,y:0},b.stTop],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[{x:0,y:0},{x:b.rearX,y:b.drop},b.stTop],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[b.htBot,{x:b.frontX,y:b.drop}],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+
+    /* The steering axis carried down to the ground, and the trail it leaves
+       behind the contact patch. This is the only place the difference between
+       a slack frame on a short fork and a steep one on a long fork is visible:
+       the frames can be the same size and still land these far apart. */
+    const gy = -b.bbh, axg = b.frontX + b.trail;
+    poly(g,[b.htTop,{x:axg,y:gy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'3 6',opacity:.45});
+    poly(g,[{x:b.frontX,y:gy},{x:axg,y:gy}],{stroke:b.color,'stroke-width':4,opacity:.9});
+    g.appendChild(el('text',{x:X(b.frontX)+4,y:labelY(X(b.frontX)+4,Y(gy)+30),fill:b.color,'font-size':21,opacity:.9,
+      'font-family':'JetBrains Mono, monospace'}, Math.round(b.trail)+' trail'));
+
+    // seatpost to the saddle height, and the shared cockpit fitted to this frame
+    poly(g,[b.stTop,f.axis],{stroke:b.color,'stroke-width':1.4,'stroke-dasharray':'5 5',opacity:.85});
+    poly(g,[b.htTop,f.clamp,f.bar],{stroke:b.color,'stroke-width':1.6,'stroke-dasharray':'5 5'});
+    g.appendChild(el('circle',{cx:X(f.bar.x),cy:Y(f.bar.y),r:5.5,fill:b.color}));
+    g.appendChild(el('text',{x:X(f.bar.x)+16,y:labelY(X(f.bar.x)+16,Y(f.bar.y)+7),fill:b.color,'font-size':22,
+      'font-family':'JetBrains Mono, monospace'}, Math.round(f.drop)+' mm'));
+
+    // clip-ons: up from the bar top to the pads, then forward to the hands
+    if (showAero){
+      poly(g,[{x:f.bar.x,y:f.barTop},f.pad,f.ext],
+        {stroke:b.color,'stroke-width':1.4,'stroke-dasharray':'3 4',opacity:.9});
+      g.appendChild(el('circle',{cx:X(f.ext.x),cy:Y(f.ext.y),r:4.5,fill:'none',stroke:b.color,
+        'stroke-width':1.5,'vector-effect':'non-scaling-stroke'}));
+    }
+  }
+
+  const bb = el('g',{stroke:'#e7ecf0','stroke-width':1.6}); svg.appendChild(bb);
+  bb.appendChild(el('line',{x1:X(0)-13,y1:Y(0),x2:X(0)+13,y2:Y(0),'vector-effect':'non-scaling-stroke'}));
+  bb.appendChild(el('line',{x1:X(0),y1:Y(0)-13,x2:X(0),y2:Y(0)+13,'vector-effect':'non-scaling-stroke'}));
+
+  const differs = b => Object.keys(b.cockpit).some(k => b.cockpit[k] != cock[k]);
+  const over = BIKES.filter(b=>b.on && b.cockpit && differs(b));
+  document.getElementById('cap').textContent =
+    `Every frame gets the same ${cock.spacers} mm of spacers (${RISE()} mm to the stem clamp) and a `+
+    `${cock.stem} mm stem at ${cock.angle}°`+
+    (over.length ? `, except ${over.map(b=>b.name).join(' and ')}, drawn as actually set up `+
+      over.map(b=>`(${b.cockpit.spacers ?? cock.spacers} mm of spacers, stem at ${b.cockpit.angle ?? cock.angle}°)`).join(' and ') : ``)+
+    `. `+
+    `The dot is where the bar lands; the number beside it is the saddle-to-bar drop that results. `+
+    (showAero ? `The hollow dot ahead of it is where clip-on extensions would put your hands. ` : ``)+
+    `Grey lines are your reference saddle and bar heights.`;
+}
+
+
+/* ---------- tables ---------- */
+const n0 = v => Math.round(v);
+const sgn = v => (v>0?'+':v<0?'−':'±') + Math.abs(Math.round(v));
+function nameCell(b){
+  return `<td class="name"><span class="swatch" style="background:${b.color}"></span>${b.name}</td>`;
+}
+function tables(){
+  const on = BIKES.filter(b=>b.on);
+  const datumRow = `<tr class="datum"><td class="name"><span class="swatch" style="background:#39434c"></span>Your reference position</td>
+    <td>${DATUM.barTop}</td><td>${DATUM.barX}</td><td>${DATUM.drop}</td><td>${DATUM.s2b}</td><td>—</td><td>—</td><td>—</td></tr>`;
+  document.getElementById('fitRows').innerHTML = datumRow + on.map(b=>{
+    const f = fit(b), dd = f.drop - DATUM.drop;
+    const cls = dd < -8 ? 'up' : dd > 8 ? 'low' : '';
+    return `<tr>${nameCell(b)}<td>${n0(f.barTop)}</td><td>${n0(f.bar.x)}</td>
+      <td class="${cls}">${n0(f.drop)}</td><td>${n0(f.s2b)}</td>
+      <td>${n0(b.frontX - f.bar.x)}</td>
+      <td class="${cls}">${sgn(dd)} drop, ${sgn(f.bar.x-DATUM.barX)} reach</td>
+      <td>${n0(f.post)}</td></tr>`;
+  }).join('');
+
+  if (showAero) document.getElementById('aeroRows').innerHTML = on.map(b=>{
+    const f = fit(b), dd = f.extDrop - DATUM.drop;
+    const cls = dd < -8 ? 'up' : dd > 8 ? 'low' : '';
+    return `<tr>${nameCell(b)}<td>${n0(f.pad.y)}</td><td>${n0(f.pad.x)}</td><td>${n0(f.padDrop)}</td>
+      <td>${n0(f.ext.x)}</td><td class="${cls}">${n0(f.extDrop)}</td>
+      <td class="${cls}">${sgn(dd)} drop, ${sgn(f.ext.x-DATUM.barX)} reach</td></tr>`;
+  }).join('');
+
+  document.getElementById('geoRows').innerHTML = on.map(b=>`<tr>${nameCell(b)}
+    <td>${n0(b.stack)}</td><td>${n0(b.reach)}</td><td>${b.sr.toFixed(2)}</td><td>${n0(b.ett)}</td>
+    <td>${n0(b.st)}</td><td>${b.hta}°</td><td>${b.sta}°</td><td>${b.cs}</td><td>${b.wb}</td>
+    <td>${b.trail.toFixed(1)}</td><td>${b.drop}</td><td>${b.standover ?? '—'}</td></tr>`).join('');
+  findings();
+}
+
+function findings(){
+  const f = {}; for (const b of BIKES) f[b.id] = fit(b);
+  const d = id => Math.round(f[id].drop);
+  const bx = id => Math.round(f[id].bar.x);
+  const li = [];
+
+  li.push(`<b>The solver reproduces Fairlight's own spec.</b> Asked to put your bars at the datum, it wants a
+    111 mm stem on the 56R and a 98 mm stem on the 58R. Fairlight specced 110 and 100. Run it the other way — their
+    stems and spacers as given, solving for the overhead that lands on the bar coordinates their report says those
+    builds achieve — and it comes out at 36.7 mm on both sizes, which is what a 17 mm Hope Cup 1 plus a stem clamp
+    should be. That's the model checking out against a professional fit, not against itself.`);
+
+  li.push(`<b>The Faran is a low-trail bike, and that's the real difference.</b> 60 mm of fork rake gives 52.6 mm of
+    trail on the 56R and 49.3 on the 58R, against 66–68 on the Grizl, Grunewald and Backroad and 78 on the Stigmata.
+    That's a deliberate front-load touring choice: quick and light-feeling unloaded, and it stays neutral with weight
+    on a front rack instead of flopping. If you never fit a front bag, you're buying steering that feels busier than
+    the alternatives for a benefit you won't use.`);
+
+  li.push(`<b>Between the two Faran sizes.</b> The 56R needs 15 mm of spacers and a 110 mm stem; the 58R is slammed with
+    a 100 mm stem. Fairlight picked the 56R because it puts you mid-range with room to adjust, and that's the right
+    call — but note their comment that they normally build with 40 mm of spacers. On the 56R you'd be running 15,
+    so the front end is already lowish for the frame.`);
+
+  li.push(`<b>The Grunewald Steel L reaches your datum with no spacers at all.</b> ${bx('grunL')} / ${d('grunL')} mm of
+    drop straight off a slammed 90 mm stem — the only frame here that lands on your position without asking for
+    anything. It also has 23 mm more trail than the 56R, so it'll track calmer on loose flat ground.`);
+
+  li.push(`<b>The rest, for scale.</b> Backroad L ${bx('backL')} / ${d('backL')}, Grizl CF L ${bx('grizlL')} /
+    ${d('grizlL')}, Stigmata L ${bx('stigL')} / ${d('stigL')}. And the tourers you started with: TFLSBERG L
+    ${d('tfl540')} mm of drop, Fargo L ${d('fargoL')} mm.`);
+
+  document.getElementById('findings').innerHTML = li.map(t=>`<li>${t}</li>`).join('');
+}
+
+/* ---------- controls ---------- */
+/* Chips are grouped by maker and the maker's name is stripped from the chip
+   itself, so a chip reads as the size within its brand — 33 frames in one flat
+   row was unfindable. The reference bike leads, the rest are alphabetical. */
+const chips = document.getElementById('chips');
+const brands = [...new Set(BIKES.map(b=>b.brand))]
+  .sort((a,b)=> a==='Cinelli' ? -1 : b==='Cinelli' ? 1 : a.localeCompare(b));
+for (const brand of brands){
+  const grp = document.createElement('div'); grp.className='brand';
+  const h = document.createElement('span'); h.className='brandName'; h.textContent = brand;
+  const row = document.createElement('div'); row.className='brandChips';
+  grp.append(h,row);
+  for (const b of BIKES.filter(x=>x.brand===brand)){
+    const c=document.createElement('button');
+    c.className='chip'; c.setAttribute('aria-pressed',String(b.on));
+    /* the brand is already the group heading; don't repeat it on the chip */
+    const short = b.name.startsWith(brand+' ') ? b.name.slice(brand.length+1) : b.name;
+    c.innerHTML=`<span class="dot" style="background:${b.color}"></span>${short}`;
+    c.title = b.name;
+    c.addEventListener('click',()=>{b.on=!b.on;c.setAttribute('aria-pressed',String(b.on));render();});
+    b.chip=c; row.appendChild(c);
+  }
+  chips.appendChild(grp);
+}
+document.getElementById('find').addEventListener('input',e=>{
+  const q = e.target.value.trim().toLowerCase();
+  for (const b of BIKES) b.chip.hidden = q && !(b.brand+' '+b.name).toLowerCase().includes(q);
+  for (const grp of chips.children)
+    grp.hidden = ![...grp.querySelectorAll('.chip')].some(c=>!c.hidden);
+});
+function setAll(p){BIKES.forEach(b=>{b.on=p(b);b.chip.setAttribute('aria-pressed',String(b.on));});render();}
+document.getElementById('allBtn').addEventListener('click',()=>setAll(()=>true));
+document.getElementById('noneBtn').addEventListener('click',()=>setAll(()=>false));
+document.getElementById('endBtn').addEventListener('click',
+  ()=>setAll(b=>['grunL','backL','grizlL','nuroadL','sklarLG','hookL'].includes(b.id)));
+document.getElementById('sfBtn').addEventListener('click',
+  ()=>setAll(b=>['faran56','faran58','sklarML','sklarLG','pbjL'].includes(b.id)));
+document.getElementById('lBtn').addEventListener('click',
+  ()=>setAll(b=>['tutto','tfl540','fargoL'].includes(b.id)));
+const wbn=document.getElementById('wheelBtn');
+wbn.addEventListener('click',()=>{showWheels=!showWheels;wbn.setAttribute('aria-pressed',String(showWheels));draw();});
+const abn=document.getElementById('aeroBtn');
+abn.addEventListener('click',()=>{
+  showAero=!showAero; abn.setAttribute('aria-pressed',String(showAero));
+  for (const id of ['aeroHead','aeroWrap','aeroNote']) document.getElementById(id).hidden = !showAero;
+  render();
+});
+for (const [id,fn] of [['rise',v=>cock.spacers=v],['oh',v=>cock.overhead=v],['stem',v=>cock.stem=v],['sh',v=>saddleY=v],
+                       ['apr',v=>aero.rise=v],['aex',v=>aero.ext=v],['atl',v=>aero.tilt=v]])
+  document.getElementById(id).addEventListener('input',e=>{
+    const v=parseFloat(e.target.value); if(!isNaN(v)){fn(v);render();}});
+document.getElementById('sa').addEventListener('change',e=>{cock.angle=parseFloat(e.target.value);render();});
+
+function render(){
+  document.getElementById('aprEcho').textContent = n0(aero.rise);
+  document.getElementById('aexEcho').textContent = n0(aero.ext);
+  document.getElementById('atlEcho').textContent = n0(aero.tilt);
+  draw();tables();
+}
+render();
+</script>
+</body>
+</html>
