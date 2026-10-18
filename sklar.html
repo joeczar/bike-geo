@@ -155,7 +155,7 @@
 
   <section class="panel" style="margin-top:14px">
     <div class="inputs tight" style="border-top:0;padding-top:0;margin-top:0">
-      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="718" step="1"></div>
+      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="675" step="1"></div>
       <div><label for="ins">Inseam (mm)</label><input id="ins" type="number" value="840" step="5"></div>
       <div><button id="wheelBtn" aria-pressed="false">Wheels</button></div>
       <div><button id="datumBtn" aria-pressed="true">Jan 2026 datum</button></div>
@@ -220,7 +220,7 @@
     <br><br>
     <b>A negative figure in the dial-in table is not a spacer you can fit.</b> Read it as the amount the frame's own front end already stands above the Tutto's bar with the stem sitting as low as it goes — the SuperSomething is a taller-stack frame by design. The table is there so you can see the trade: a steeper negative angle buys height back, a longer stem spends it again, and reach moves with stem length almost independently of the angle you choose.
     <br><br>
-    <b>Sizing.</b> Sklar size by saddle height, BB centre to saddle top: <b>L 730–795</b>, M-L 690–750, XL 780–845. Your saddle height, measured on the Tutto in Oct 2026, is <b>745 mm</b> — inside both the L and the top of the M-L, so both are real candidates. (The fit report's 775 would have put you outside the M-L; it was a hand measurement and 30 mm high.) Head angle is 70.5° on M-L, L and XL alike, so unlike the Terrel, sizing between them changes reach and stack but not trail. Standover isn't on Sklar's current chart; the figures in the table are the ones the shortlist already carried, of unrecorded source. Frameset facts: double-butted chromoly, 142 × 12 / 100 × 12 thru-axles, UDH, flat-mount brakes, 68 mm BSA, 27.2 post, 700 × 52 clearance, up to a 44T single ring, three bottle mounts, full external routing, 2520 g frame (L) and 1100 g uncut steel fork. Stock builds use a Ritchey Venturemax flared bar.
+    <b>Sizing.</b> Sklar size by saddle height, BB centre to saddle top: <b>L 730–795</b>, M-L 690–750, XL 780–845. Your saddle height, measured on the Tutto in Oct 2026, is <b>700 mm</b> — inside the M-L and below the L's window. (The fit report's 775 was a hand measurement and 75 mm high.) Head angle is 70.5° on M-L, L and XL alike, so unlike the Terrel, sizing between them changes reach and stack but not trail. Standover isn't on Sklar's current chart; the figures in the table are the ones the shortlist already carried, of unrecorded source. Frameset facts: double-butted chromoly, 142 × 12 / 100 × 12 thru-axles, UDH, flat-mount brakes, 68 mm BSA, 27.2 post, 700 × 52 clearance, up to a 44T single ring, three bottle mounts, full external routing, 2520 g frame (L) and 1100 g uncut steel fork. Stock builds use a Ritchey Venturemax flared bar.
   </p>
 </div>
 <script>
@@ -234,7 +234,7 @@ const BAR_TOP = 15;
 const FRAMES = [
   { id:'tutto', name:'Cinelli Tutto Plus L', short:'Tutto L', color:'#f2f5f7', ref:true,
     stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
-    standover:null, tire:692, rake:45 },
+    standover:810, tire:692, rake:45 },
   { id:'sklarML', name:'Sklar SuperSomething M-L', short:'SuperSomething M-L', color:'#8fbfd9',
     stack:607, reach:386, ett:566, st:538, ht:166, hta:70.5, sta:73.5, drop:73, cs:426, fc:638,
     standover:822, tire:718, rake:55 },
@@ -285,7 +285,7 @@ const ANGLES = [17,12,6,0,-6,-12,-17];
 const defaults = () => ({
   cockA: { spacers:35, overhead:30, stem:80, angle:6 },
   cockB: { spacers:0, overhead:30, stem:90, angle:-6 },
-  saddleY:718, inseam:840, showWheels:false, showDatum:true, bId:'sklarML' });
+  saddleY:675, inseam:840, showWheels:false, showDatum:true, bId:'sklarML' });
 
 const num = (v,fb,lo,hi) => (typeof v === 'number' && isFinite(v) && v >= lo && v <= hi) ? v : fb;
 function cleanCock(c,fb){
@@ -299,10 +299,10 @@ function apply(st){
   const d = defaults();
   cockA = cleanCock(st.cockA, d.cockA);
   cockB = cleanCock(st.cockB, d.cockB);
-  /* 743 was the old default, derived from the January 2026 fit report. A stored
-     743 is that default left untouched, not a choice, so it moves to the Oct 2026
-     measurement; anything else the slider was set to is kept. */
-  saddleY = st.saddleY === 743 ? d.saddleY : num(st.saddleY, d.saddleY, 500, 1000);
+  /* 743 (Jan 2026 fit report) and 718 (first Oct 2026 tape reading) were old
+     defaults. A stored one is that default left untouched, not a choice, so it
+     moves to the current measurement; anything else the slider was set to is kept. */
+  saddleY = [743,718].includes(st.saddleY) ? d.saddleY : num(st.saddleY, d.saddleY, 500, 1000);
   inseam = num(st.inseam, d.inseam, 500, 1100);
   showWheels = st.showWheels === true;
   showDatum = st.showDatum !== false;
@@ -389,7 +389,7 @@ function draw(){
     svg.appendChild(el('text',{x:X(minX)+xoff,y:Y(y)-12,fill:col,'font-size':21,'letter-spacing':1.5,
       'font-family':'Archivo Narrow, sans-serif','font-weight':700}, label));
   };
-  rule(saddleY,'SADDLE TOP','#39434c','10 8');
+  rule(saddleY,'SADDLE TOP · '+Math.round(saddleY/Math.sin(rad(F.tutto.sta))/5)*5+' SADDLE HEIGHT, OCT 2026','#39434c','10 8');
   rule(fa.barTop,'TUTTO BAR TOP · '+Math.round(fa.drop)+' MM DROP','#8b98a4','10 8',480);
   if (showDatum){
     rule(DATUM.barTop,'JAN 2026 DATUM · '+DATUM.drop+' MM DROP','#39434c','3 7');
@@ -546,7 +546,7 @@ function findings(){
 
   li.push(`<b>Seatpost and standover.</b> At a ${n0(saddleY)} mm saddle top the Tutto leaves ${n0(fa.post)} mm of post
     out of a ${A().st} mm seat tube; ${b.short} leaves ${n0(fb.post)} of a ${b.st}. Standover on the
-    ${b.short} is ${b.standover ? b.standover+' mm, leaving '+sgn(inseam - b.standover)+' mm of clearance at your '+inseam+' mm inseam' : 'not published'}; Cinelli print none for the Tutto, so there is nothing to hold it against.`);
+    ${b.short} is ${b.standover ? b.standover+' mm, leaving '+sgn(inseam - b.standover)+' mm of clearance at your '+inseam+' mm inseam' : 'not published'}; the Tutto's, measured on your bike in Oct 2026, is ${A().standover} mm (${sgn(inseam - A().standover)}).`);
 
   document.getElementById('findings').innerHTML = li.map(t=>`<li>${t}</li>`).join('');
 }

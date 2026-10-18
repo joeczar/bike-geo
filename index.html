@@ -90,7 +90,7 @@
   <section class="panel">
     <p class="eyebrow">Datum · your position from the Fairlight report, 9 Jan 2026</p>
     <dl class="grid">
-      <div class="m"><dt>Saddle height · Oct 2026</dt><dd>745</dd></div>
+      <div class="m"><dt>Saddle height · Oct 2026</dt><dd>700</dd></div>
       <div class="m"><dt>Bar top</dt><dd>663</dd></div>
       <div class="m"><dt>Bar reach</dt><dd>489</dd></div>
       <div class="m"><dt>Drop</dt><dd>80</dd></div>
@@ -103,7 +103,7 @@
       <div><label for="sa">Stem angle</label>
         <select id="sa"><option value="0">0°</option><option value="-6">−6°</option>
         <option value="-12">−12°</option><option value="-17">−17°</option><option value="6" selected>+6°</option></select></div>
-      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="718" step="1"></div>
+      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="675" step="1"></div>
       <div><label for="ins">Inseam (mm)</label><input id="ins" type="number" value="840" step="5"></div>
       <div><label for="apr">Aero pad rise</label><input id="apr" type="number" value="45" step="5"></div>
       <div><label for="aex">Aero extension</label><input id="aex" type="number" value="200" step="10"></div>
@@ -176,7 +176,7 @@
     <br><br>
     The stem is the thing to hold in mind when reading its bar position. Sklar design the PBJ around a <b>30–50 mm stem</b> and ship complete builds with a 35, paired with their swept-back riser bar, which pulls the hands back again. This page fits a 90 mm stem to every frame, so the PBJ's bar is drawn something like 55 mm further forward than Sklar intend, before any bar sweep. They also say outright that a drop bar on a PBJ is possible but hard to fit well, and point drop-bar riders at the SuperSomething instead. It's a rigid 29er on a 29 × 2.6 reference tyre.
     <br><br>
-    Sklar size by the same two numbers this page is built on. Your saddle height, measured on the Tutto in Oct 2026, is <b>745 mm</b> (the fit report's 775 was 30 mm high). Their PBJ chart puts that on the <b>L</b> — saddle height 730–790, saddle to stem 530–570, so the report's 545 sits mid-window — with the M outside both ranges. On the SuperSomething, 745 sits in the L (730–795) and near the top of the M-L (690–750), so both fit. Sklar measure saddle <em>tip</em> to stem centre where the fit report measures saddle to bar, so treat that as close, not identical.
+    Sklar size by the same two numbers this page is built on. Your saddle height, measured on the Tutto in Oct 2026, is <b>700 mm</b> (the fit report's 775 was 75 mm high). That is below the PBJ L's 730–790 window. On the SuperSomething it sits inside the M-L (690–750) and below the L (730–795). Sklar measure saddle <em>tip</em> to stem centre where the fit report measures saddle to bar, so treat that as close, not identical.
     <br><br>
     <b>‡ Standert.</b> Both charts are Standert's own, and both stop short of the two numbers this page needs for the front wheel: neither prints BB drop, and only the Erdgeschoss prints an offset. The Erdgeschoss fork is a Columbus Cross+ with a rake you choose at 47 or 52 mm; closing the published wheelbase against the 52 mm setting wants 75 mm of BB drop, and that same 75 reproduces 52.0 mm on the 58 and 51.5 on the 60 — consistent enough to trust, and the ordinary figure for a gravel frame. Its 425 mm chainstay is the shortest position of a sliding dropout. The Kreissäge RS prints neither, so 70 mm of drop is assumed as the road standard, which then derives 43.5–43.9 mm of offset — normal for a 73.5° race frame, but it is an assumption, not a published figure. Drawn on a 32 mm reference tyre against a 35 mm maximum, where the Erdgeschoss gets the 45 mm everything else here uses.
     <br><br>
@@ -199,7 +199,7 @@ const BIKES = [
      nothing, so it is not counted. Every other frame gets the shared cockpit. */
   { id:'tutto', brand:'Cinelli',  name:'Cinelli Tutto Plus L', ref:true, color:'#f2f5f7', on:true,
     stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
-    standover:null, tire:692, rake:45, cockpit:{ spacers:35, angle:6, stem:80 } },
+    standover:810, tire:692, rake:45, cockpit:{ spacers:35, angle:6, stem:80 } },
   { id:'tfl510', brand:'8bar', name:'8bar TFLSBERG M (510)', color:'#3ecfc2', on:false,
     stack:613, reach:389, ett:570, st:510, ht:180, hta:70, sta:73.5, drop:75, cs:440, wb:1071,
     standover:825, tire:736.3 },
@@ -322,7 +322,7 @@ const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
 /* Defaults are Joe's own cockpit — 35 mm of spacers, stem flipped up — so every
    frame is tried with the setup he actually rides. Keep these in step with the
    value attributes on the inputs above. */
-let cock = { spacers:35, overhead:30, stem:90, angle:6 }, saddleY = 718, inseam = 840, showWheels = false;
+let cock = { spacers:35, overhead:30, stem:90, angle:6 }, saddleY = 675, inseam = 840, showWheels = false;
 /* clip-on aero bars, same set fitted to every frame: pads above the bar top,
    hands forward of the pads and level with them */
 let aero = { rise:45, ext:200, tilt:10 }, showAero = false;
@@ -381,7 +381,7 @@ function draw(){
     'stroke-dasharray':'2 8','vector-effect':'non-scaling-stroke'}));
 
   // datum: saddle top and bar top heights from the fit report
-  for (const [y,label] of [[saddleY,'SADDLE TOP'],[DATUM.barTop,'DATUM BAR TOP · '+DATUM.drop+' MM DROP']]){
+  for (const [y,label] of [[saddleY,'SADDLE TOP · '+Math.round(saddleY/Math.sin(rad(BIKES.find(b=>b.id==='tutto').sta))/5)*5+' SADDLE HEIGHT, OCT 2026'],[DATUM.barTop,'DATUM BAR TOP · '+DATUM.drop+' MM DROP']]){
     svg.appendChild(el('line',{x1:X(minX),y1:Y(y),x2:X(maxX),y2:Y(y),stroke:'#39434c','stroke-width':1,
       'stroke-dasharray':'10 8','vector-effect':'non-scaling-stroke'}));
     svg.appendChild(el('text',{x:X(minX)+6,y:Y(y)-12,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
