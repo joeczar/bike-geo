@@ -158,6 +158,7 @@
       <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="675" step="1"></div>
       <div><label for="ins">Inseam (mm)</label><input id="ins" type="number" value="840" step="5"></div>
       <div><button id="wheelBtn" aria-pressed="false">Wheels</button></div>
+      <div><button id="myWhBtn" aria-pressed="false" title="Both frames on your 710 mm tyres, aligned at the floor">Your wheels</button></div>
       <div><button id="datumBtn" aria-pressed="true">Jan 2026 datum</button></div>
       <div><button id="resetBtn">Reset</button></div>
     </div>
@@ -224,7 +225,7 @@ const BAR_TOP = 15;
 const FRAMES = [
   { id:'tutto', name:'Cinelli Tutto Plus L', short:'Tutto L', color:'#f2f5f7', ref:true,
     stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
-    standover:810, tire:692, rake:45 },
+    standover:810, tire:710, rake:45 },
   { id:'terrelM', name:'Propain Terrel CF M', short:'Terrel M', color:'#ef7fb0',
     stack:583, reach:405, ett:578, st:525, ht:130, hta:70.5, sta:73.5, drop:72, cs:435, wb:1062,
     standover:820, tire:712, rake:45 },
@@ -251,13 +252,31 @@ for (const b of FRAMES){
   b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
 }
 
+/* Your wheels: every frame on the tyre Joe actually rides — 710 mm, from the
+   Tutto's measured 295 BB height plus its 60 drop — and the drawing aligned at
+   the Tutto's floor. Published standover is corrected from the maker's reference
+   tyre to his by half the diameter difference. Off, each frame sits on its own
+   reference tyre and everything is aligned at the BB as usual. */
+const MY_TIRE = 710;
+/* myWheels is page state, declared with the rest below. */
+const TUTTO = F.tutto;
+function setTyres(){
+  for (const b of FRAMES){
+    const d = myWheels ? MY_TIRE : b.tire;
+    b.R = d/2; b.bbh = b.R - b.drop;
+    b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
+    b.so = b.standover ? b.standover + (d - b.tire)/2 : null;
+    b.lift = myWheels ? b.bbh - TUTTO.bbh : 0;
+  }
+}
+
 /* The January reference, kept as a dated marker rather than a target. */
 const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
 
 /* Two independent cockpits — the whole point of this page. A starts as the Tutto
    as actually ridden; B starts as the same parts moved across, so the first thing
    you see is what bolting your own cockpit onto the Terrel would do. */
-let cockA, cockB, saddleY, inseam, showWheels, showDatum, bId;
+let cockA, cockB, saddleY, inseam, showWheels, myWheels = false, showDatum, bId;
 const A = () => F.tutto, Bf = () => F[bId];
 
 /* Saved in this browser so a half-dialled build survives closing the tab —
@@ -275,7 +294,7 @@ const ANGLES = [17,12,6,0,-6,-12,-17];
 const defaults = () => ({
   cockA: { spacers:35, overhead:30, stem:80, angle:6 },
   cockB: { spacers:10, overhead:40, stem:80, angle:6 },
-  saddleY:675, inseam:840, showWheels:false, showDatum:true, bId:'terrelM' });
+  saddleY:675, inseam:840, showWheels:false, myWheels:false, showDatum:true, bId:'terrelM' });
 
 const num = (v,fb,lo,hi) => (typeof v === 'number' && isFinite(v) && v >= lo && v <= hi) ? v : fb;
 function cleanCock(c,fb){
@@ -295,11 +314,12 @@ function apply(st){
   saddleY = [743,718].includes(st.saddleY) ? d.saddleY : num(st.saddleY, d.saddleY, 500, 1000);
   inseam = num(st.inseam, d.inseam, 500, 1100);
   showWheels = st.showWheels === true;
+  myWheels = st.myWheels === true;
   showDatum = st.showDatum !== false;
   bId = F[st.bId] && st.bId !== 'tutto' ? st.bId : d.bId;
 }
 function save(){
-  try { localStorage.setItem(KEY, JSON.stringify({ cockA, cockB, saddleY, inseam, showWheels, showDatum, bId })); }
+  try { localStorage.setItem(KEY, JSON.stringify({ cockA, cockB, saddleY, inseam, showWheels, myWheels, showDatum, bId })); }
   catch (e) { /* private mode, or storage disabled: the page still works, it just forgets */ }
 }
 function load(){
@@ -347,9 +367,9 @@ function solveBoth(b,c,angle,tx,ty){
 
 /* ---------- drawing ---------- */
 const PAD = { l:70, r:150, t:64, b:104 };
-const minX = Math.min(...FRAMES.map(b=>b.rearX - b.R));
-const maxX = Math.max(...FRAMES.map(b=>b.frontX + b.R));
-const minY = -Math.max(...FRAMES.map(b=>b.bbh));
+const minX = Math.min(...FRAMES.map(b=>b.rearX - Math.max(b.tire,MY_TIRE)/2));
+const maxX = Math.max(...FRAMES.map(b=>b.frontX + Math.max(b.tire,MY_TIRE)/2));
+const minY = -Math.max(...FRAMES.map(b=>Math.max(b.tire,MY_TIRE)/2 - b.drop));
 const maxY = 800;
 const W = (maxX-minX) + PAD.l + PAD.r, H = (maxY-minY) + PAD.t + PAD.b;
 const X = x => (x - minX) + PAD.l, Y = y => (maxY - y) + PAD.t;
@@ -363,6 +383,7 @@ function poly(p,pts,o={}){const n=el('polyline',Object.assign({
 const svg = document.getElementById('plot');
 
 function draw(){
+  setTyres();
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.innerHTML='';
   const pairs = [[A(),cockA],[Bf(),cockB]];
@@ -399,22 +420,22 @@ function draw(){
      the clearance it leaves at the inseam. The inseam itself is one rule, drawn from the average of
      the two ground lines, which sit within a couple of millimetres here. */
   const sFrames = pairs.map(p=>p[0]);
-  const gnd = sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
+  const gnd = myWheels ? TUTTO.bbh : sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
   svg.appendChild(el('line',{x1:X(minX),y1:Y(inseam-gnd),x2:X(maxX),y2:Y(inseam-gnd),stroke:'#5c6873','stroke-width':1,
     'stroke-dasharray':'2 6','vector-effect':'non-scaling-stroke'}));
   svg.appendChild(el('text',{x:X(minX)+6,y:Y(inseam-gnd)+28,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
     'font-family':'Archivo Narrow, sans-serif','font-weight':700}, 'INSEAM '+inseam));
   for (const b of sFrames){
-    if (!b.standover) continue;
-    const sy = b.standover - b.bbh, sx = (b.stTop.x + b.htTop.x)/2;
-    poly(svg,[{x:sx,y:-b.bbh},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
+    if (!b.so) continue;
+    const sy = b.so - b.bbh + b.lift, sx = (b.stTop.x + b.htTop.x)/2;
+    poly(svg,[{x:sx,y:-b.bbh + b.lift},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
     poly(svg,[{x:sx-50,y:sy},{x:sx+50,y:sy}],{stroke:b.color,'stroke-width':4,opacity:.9});
     svg.appendChild(el('text',{x:X(sx)+56,y:labelY(X(sx)+56,Y(sy)+8),fill:b.color,'font-size':20,opacity:.9,
-      'font-family':'JetBrains Mono, monospace'}, b.standover+' so · '+sgn(inseam-b.standover)));
+      'font-family':'JetBrains Mono, monospace'}, Math.round(b.so)+' so · '+sgn(inseam-b.so)));
   }
 
   for (const [b,c] of pairs){
-    const g = el('g',{}); svg.appendChild(g);
+    const g = el('g',{transform:`translate(0,${-b.lift})`}); svg.appendChild(g);
     const w = b.ref ? 1.6 : 2.3, dash = b.ref ? '9 6' : null, f = fit(b,c);
 
     if (showWheels) for (const ax of [{x:b.rearX,y:b.drop},{x:b.frontX,y:b.drop}])
@@ -494,7 +515,7 @@ function tables(){
   document.getElementById('geoRows').innerHTML = FRAMES.map(x=>`<tr>${nameCell(x)}
     <td>${n0(x.stack)}</td><td>${n0(x.reach)}</td><td>${x.sr.toFixed(2)}</td><td>${n0(x.ett)}</td>
     <td>${n0(x.st)}</td><td>${x.hta}°</td><td>${x.sta}°</td><td>${x.cs}</td><td>${x.fc}</td><td>${x.wb}</td>
-    <td>${x.trail.toFixed(1)}</td><td>${x.drop}</td><td>${x.standover ?? '—'}</td><td>${x.standover ? sgn(inseam - x.standover) : '—'}</td></tr>`).join('');
+    <td>${x.trail.toFixed(1)}</td><td>${x.drop}</td><td>${x.so ? Math.round(x.so) : '—'}</td><td>${x.so ? sgn(inseam - x.so) : '—'}</td></tr>`).join('');
 
   solveLine();
   findings();
@@ -538,7 +559,7 @@ function findings(){
 
   li.push(`<b>Seatpost and standover.</b> At a ${n0(saddleY)} mm saddle top the Tutto leaves ${n0(fa.post)} mm of post
     out of a ${A().st} mm seat tube; ${b.short} leaves ${n0(fb.post)} of a ${b.st}. Standover on the
-    ${b.short} is ${b.standover ? b.standover+' mm, leaving '+sgn(inseam - b.standover)+' mm of clearance at your '+inseam+' mm inseam' : 'not published'}; the Tutto's, measured on your bike in Oct 2026, is ${A().standover} mm (${sgn(inseam - A().standover)}).`);
+    ${b.short} is ${b.so ? Math.round(b.so)+' mm, leaving '+sgn(inseam - b.so)+' mm of clearance at your '+inseam+' mm inseam' : 'not published'}; the Tutto's, measured on your bike in Oct 2026, is ${Math.round(A().so)} mm (${sgn(inseam - A().so)}).`);
 
   document.getElementById('findings').innerHTML = li.map(t=>`<li>${t}</li>`).join('');
 }
@@ -552,6 +573,7 @@ function sync(){
   $('bSize').value = bId;
   $('bSwatch').style.background = Bf().color;
   $('wheelBtn').setAttribute('aria-pressed', String(showWheels));
+  $('myWhBtn').setAttribute('aria-pressed', String(myWheels));
   $('datumBtn').setAttribute('aria-pressed', String(showDatum));
 }
 for (const [id,fn] of [['aSp',v=>cockA.spacers=v],['aOh',v=>cockA.overhead=v],['aStem',v=>cockA.stem=v],
@@ -575,6 +597,7 @@ $('matchBtn').addEventListener('click',()=>{
   cockB.spacers = Math.max(0, Math.round(s.spacers*2)/2); sync(); render();
 });
 $('wheelBtn').addEventListener('click',()=>{ showWheels=!showWheels; sync(); render(); });
+$('myWhBtn').addEventListener('click',()=>{ myWheels=!myWheels; sync(); render(); });
 $('datumBtn').addEventListener('click',()=>{ showDatum=!showDatum; sync(); render(); });
 $('resetBtn').addEventListener('click',()=>{
   try { localStorage.removeItem(KEY); } catch (e) {}

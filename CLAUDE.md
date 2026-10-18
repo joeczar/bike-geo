@@ -163,6 +163,15 @@ that frame's top tube, measured from its own ground line and labelled
 `850 so · −10` (standover · clearance). The inseam is one dotted rule, measured
 from the average ground line of the frames on show.
 
+**Your wheels** (button on all three pages, persisted on the dial-in pages):
+every frame on Joe's 710 mm tyres instead of its maker's reference tyre, and
+each frame group translated so its ground line sits on the Tutto's floor.
+`setTyres()` runs at the top of `draw()` and recomputes `R`, `bbh`, `trail`,
+`so` (standover corrected by half the tyre-diameter difference) and `lift` (the
+vertical shift). Use `b.so`, not `b.standover`, anywhere standover is shown.
+Shared rules (saddle top, Tutto bar top, datum, inseam) stay referenced to the
+Tutto, which never moves. Off is the old behaviour: own tyres, aligned at the BB.
+
 The saddle is modelled per-frame: fixed saddle-top height, so each frame's seat
 angle decides the fore/aft position and the exposed post length. Earlier versions
 plotted a single floating point 50 mm behind the BB, which was wrong — that 50 is
@@ -256,9 +265,6 @@ fine.
   by noticing the row claimed *less* rake than the Terrel while showing similar
   trail, which is the signature of a mismatched head angle. Treat that pattern as
   a data smell, not a curiosity.
-- **Bombtrack Hook EXT L** — these are the **titanium 27.5"** figures. The steel
-  700C Hook's chart was unobtainable (bombtrack.com blocks automated access).
-  Footnoted `**`. Shared platform, but BB drop and stack will differ.
 - **Cinelli Tutto Plus L (56)** — **confirmed against Cinelli's own numbers**,
   Aug 2026. Their site renders the geometry table from a `GEOMETRY_DATA` JSON
   blob inline in the product page HTML (`/products/tutto-plus-*`), not from an
@@ -272,7 +278,9 @@ fine.
   against 45 to within 1 mm where the printed **wheelbase 1024 wants 37** — the
   same conflict as the Sklar PBJ, resolved the same way. The entry therefore
   carries `fc:616` and `rake:45`, and the wheelbase shown is the derived 1034.
-  Trail is 65, not the 74 the old derived offset gave. Do not revert to `wb`.
+  Trail is ~68 on the measured 710 tyre (65 on the old 692 guess), not the 74
+  the old derived offset gave. Do not revert to `wb`. The Tutto's `tire` is
+  **710**, from Joe's measured 295 BB height + 60 drop — not a guess.
   Frameset facts that matter: Columbus Cromor, **rear QR 130 mm** with track
   ends plus a derailleur braze-on, **V-brake pivots** (rim brake, no disc
   mounts), 45 mm tyre clearance, fork rake 45. Stock build is flat-bar with a

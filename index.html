@@ -121,6 +121,7 @@
     <button id="lBtn">Tourers</button>
     <button id="sfBtn">Sklar vs Faran</button>
     <button id="wheelBtn" aria-pressed="false">Wheels</button>
+    <button id="myWhBtn" aria-pressed="false" title="Every frame on your 710 mm tyres, aligned at the floor">Your wheels</button>
     <button id="aeroBtn" aria-pressed="false">Aero bars</button>
   </div>
 
@@ -168,8 +169,6 @@
   <ul id="findings"></ul>
 
   <p class="note">
-    <b>** Bombtrack Hook EXT L.</b> These are the Hook EXT <em>titanium</em> figures on 27.5" wheels, from Bombtrack's own chart. Their site blocks automated access, so I couldn't pull the steel 700C Hook's chart — the platform is shared but the steel 700C version will differ, most likely in BB drop and stack. Treat this row as the Hook family's shape, not the exact frame.
-    <br><br>
     <b>ROSE Backroad CF L.</b> No longer a stand-in: the whole row is the current-generation chart, including Rose's published 48 mm fork offset, and closing their wheelbase against it lands on 48.3 — so nothing here is derived. This replaced an earlier row that carried the previous generation's angles, seat tube, head tube and chainstay, which had the head angle half a degree steep and the offset 8 mm short, and so understated the trail. Rose have a Hamburg store.
     <br><br>
     <b>† Sklar PBJ.</b> Sklar's own chart, so stack, reach, angles and the 52 mm offset are published rather than derived. Standover isn't in the chart, so it's blank rather than guessed. Two of their own numbers disagree, though: closing the published <em>wheelbase</em> would want 63 mm of offset on the M and 56 on the L, but closing the published <em>front centre</em> — 730 on the M, 755 on the L — gives 52.1 and 53.2 against their stated 52. The front centre is the number that fits, so the front wheel here is placed from it, which makes the wheelbase in the table 1153 and 1179 rather than the 1165 and 1182 Sklar print.
@@ -199,7 +198,7 @@ const BIKES = [
      nothing, so it is not counted. Every other frame gets the shared cockpit. */
   { id:'tutto', brand:'Cinelli',  name:'Cinelli Tutto Plus L', ref:true, color:'#f2f5f7', on:true,
     stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
-    standover:810, tire:692, rake:45, cockpit:{ spacers:35, angle:6, stem:80 } },
+    standover:810, tire:710, rake:45, cockpit:{ spacers:35, angle:6, stem:80 } },
   { id:'tfl510', brand:'8bar', name:'8bar TFLSBERG M (510)', color:'#3ecfc2', on:false,
     stack:613, reach:389, ett:570, st:510, ht:180, hta:70, sta:73.5, drop:75, cs:440, wb:1071,
     standover:825, tire:736.3 },
@@ -260,9 +259,6 @@ const BIKES = [
   { id:'pbjL', brand:'Sklar',   name:'Sklar PBJ L †', color:'#c4302b', on:true,
     stack:641, reach:475, ett:659, st:505, ht:140, hta:69, sta:74, drop:68, cs:432, fc:755,
     standover:null, tire:754, rake:52 },
-  { id:'hookL', brand:'Bombtrack', name:'Bombtrack Hook EXT L **', color:'#d98f5a', on:true,
-    stack:612, reach:390, ett:572, st:570, ht:170, hta:71.5, sta:73.5, drop:66, cs:425, wb:1049,
-    standover:834, tire:700, rake:53 },
   { id:'grizlL', brand:'Canyon', name:'Canyon Grizl CF L', color:'#ffd166', on:true,
     stack:605, reach:409, ett:578, st:552, ht:164, hta:72.5, sta:73.5, drop:75, cs:435, wb:1050,
     standover:845, tire:712 },
@@ -317,6 +313,24 @@ for (const b of BIKES){
   b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
 }
 
+/* Your wheels: every frame on the tyre Joe actually rides — 710 mm, from the
+   Tutto's measured 295 BB height plus its 60 drop — and the drawing aligned at
+   the Tutto's floor. Published standover is corrected from the maker's reference
+   tyre to his by half the diameter difference. Off, each frame sits on its own
+   reference tyre and everything is aligned at the BB as usual. */
+const MY_TIRE = 710;
+let myWheels = false;
+const TUTTO = BIKES.find(b=>b.id==='tutto');
+function setTyres(){
+  for (const b of BIKES){
+    const d = myWheels ? MY_TIRE : b.tire;
+    b.R = d/2; b.bbh = b.R - b.drop;
+    b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
+    b.so = b.standover ? b.standover + (d - b.tire)/2 : null;
+    b.lift = myWheels ? b.bbh - TUTTO.bbh : 0;
+  }
+}
+
 /* datum from the fit report */
 const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
 /* Defaults are Joe's own cockpit — 35 mm of spacers, stem flipped up — so every
@@ -357,9 +371,9 @@ function fit(b){
 /* b leaves room for the trail figures under the ground line, stacked when
    several frames land on top of each other */
 const PAD = { l:70, r:150, t:64, b:130 };
-const minX = Math.min(...BIKES.map(b=>b.rearX - b.R));
-const maxX = Math.max(...BIKES.map(b=>b.frontX + b.R));
-const minY = -Math.max(...BIKES.map(b=>b.bbh));
+const minX = Math.min(...BIKES.map(b=>b.rearX - Math.max(b.tire,MY_TIRE)/2));
+const maxX = Math.max(...BIKES.map(b=>b.frontX + Math.max(b.tire,MY_TIRE)/2));
+const minY = -Math.max(...BIKES.map(b=>Math.max(b.tire,MY_TIRE)/2 - b.drop));
 const maxY = 800;
 const W = (maxX-minX) + PAD.l + PAD.r, H = (maxY-minY) + PAD.t + PAD.b;
 const X = x => (x - minX) + PAD.l, Y = y => (maxY - y) + PAD.t;
@@ -373,6 +387,7 @@ function poly(p,pts,o={}){const n=el('polyline',Object.assign({
 const svg = document.getElementById('plot');
 
 function draw(){
+  setTyres();
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.innerHTML='';
   const on = BIKES.filter(b=>b.on);
@@ -403,22 +418,22 @@ function draw(){
      the clearance it leaves at the inseam. The inseam itself is one rule, drawn from the average ground
      of the frames on show, since reference tyres move each ground line a little. */
   const sFrames = on;
-  const gnd = sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
+  const gnd = myWheels ? TUTTO.bbh : sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
   svg.appendChild(el('line',{x1:X(minX),y1:Y(inseam-gnd),x2:X(maxX),y2:Y(inseam-gnd),stroke:'#5c6873','stroke-width':1,
     'stroke-dasharray':'2 6','vector-effect':'non-scaling-stroke'}));
   svg.appendChild(el('text',{x:X(minX)+6,y:Y(inseam-gnd)+28,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
     'font-family':'Archivo Narrow, sans-serif','font-weight':700}, 'INSEAM '+inseam));
   for (const b of sFrames){
-    if (!b.standover) continue;
-    const sy = b.standover - b.bbh, sx = (b.stTop.x + b.htTop.x)/2;
-    poly(svg,[{x:sx,y:-b.bbh},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
+    if (!b.so) continue;
+    const sy = b.so - b.bbh + b.lift, sx = (b.stTop.x + b.htTop.x)/2;
+    poly(svg,[{x:sx,y:-b.bbh + b.lift},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
     poly(svg,[{x:sx-50,y:sy},{x:sx+50,y:sy}],{stroke:b.color,'stroke-width':4,opacity:.9});
     svg.appendChild(el('text',{x:X(sx)+56,y:labelY(X(sx)+56,Y(sy)+8),fill:b.color,'font-size':20,opacity:.9,
-      'font-family':'JetBrains Mono, monospace'}, b.standover+' so · '+sgn(inseam-b.standover)));
+      'font-family':'JetBrains Mono, monospace'}, Math.round(b.so)+' so · '+sgn(inseam-b.so)));
   }
 
   for (const b of on){
-    const g = el('g',{}); svg.appendChild(g);
+    const g = el('g',{transform:`translate(0,${-b.lift})`}); svg.appendChild(g);
     const w = b.ref ? 1.6 : 2.3, dash = b.ref ? '9 6' : null, f = fit(b);
 
     if (showWheels) for (const ax of [{x:b.rearX,y:b.drop},{x:b.frontX,y:b.drop}])
@@ -507,7 +522,7 @@ function tables(){
   document.getElementById('geoRows').innerHTML = on.map(b=>`<tr>${nameCell(b)}
     <td>${n0(b.stack)}</td><td>${n0(b.reach)}</td><td>${b.sr.toFixed(2)}</td><td>${n0(b.ett)}</td>
     <td>${n0(b.st)}</td><td>${b.hta}°</td><td>${b.sta}°</td><td>${b.cs}</td><td>${b.wb}</td>
-    <td>${b.trail.toFixed(1)}</td><td>${b.drop}</td><td>${b.standover ?? '—'}</td><td>${b.standover ? sgn(inseam - b.standover) : '—'}</td></tr>`).join('');
+    <td>${b.trail.toFixed(1)}</td><td>${b.drop}</td><td>${b.so ? Math.round(b.so) : '—'}</td><td>${b.so ? sgn(inseam - b.so) : '—'}</td></tr>`).join('');
   findings();
 }
 
@@ -579,13 +594,15 @@ function setAll(p){BIKES.forEach(b=>{b.on=p(b);b.chip.setAttribute('aria-pressed
 document.getElementById('allBtn').addEventListener('click',()=>setAll(()=>true));
 document.getElementById('noneBtn').addEventListener('click',()=>setAll(()=>false));
 document.getElementById('endBtn').addEventListener('click',
-  ()=>setAll(b=>['grunL','backL','grizlL','nuroadL','sklarLG','hookL'].includes(b.id)));
+  ()=>setAll(b=>['grunL','backL','grizlL','nuroadL','sklarLG'].includes(b.id)));
 document.getElementById('sfBtn').addEventListener('click',
   ()=>setAll(b=>['faran56','faran58','sklarML','sklarLG','pbjL'].includes(b.id)));
 document.getElementById('lBtn').addEventListener('click',
   ()=>setAll(b=>['tutto','tfl540','fargoL'].includes(b.id)));
 const wbn=document.getElementById('wheelBtn');
 wbn.addEventListener('click',()=>{showWheels=!showWheels;wbn.setAttribute('aria-pressed',String(showWheels));draw();});
+const mwb=document.getElementById('myWhBtn');
+mwb.addEventListener('click',()=>{myWheels=!myWheels;mwb.setAttribute('aria-pressed',String(myWheels));render();});
 const abn=document.getElementById('aeroBtn');
 abn.addEventListener('click',()=>{
   showAero=!showAero; abn.setAttribute('aria-pressed',String(showAero));
