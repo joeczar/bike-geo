@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperSomething against the Tutto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Narrow:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#12161a; --panel:#171c21; --panel2:#1b2126; --rule:#262e35;
+         --fg:#e7ecf0; --mute:#8b98a4; --up:#6fa8dc; --low:#e0b341; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--fg);
+    font-family:'Archivo',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 16px 72px}
+  .eyebrow{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.18em;font-size:11px;color:var(--mute);margin:0}
+  h1{font-weight:800;font-size:clamp(25px,6vw,40px);line-height:1.03;letter-spacing:-.02em;margin:10px 0 14px}
+  .lede{max-width:64ch;color:#b9c4cd;font-size:15px;line-height:1.55;margin:0 0 26px}
+  h2{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.16em;
+    font-size:12px;color:var(--mute);margin:38px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  .panel{border:1px solid var(--rule);background:var(--panel);border-radius:2px;padding:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:14px;margin:12px 0 0}
+  .m{border-left:2px solid #2f3a43;padding-left:10px}
+  .m dt{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+    font-size:10.5px;color:var(--mute);margin:0 0 3px}
+  .m dd{margin:0;font-family:'JetBrains Mono',monospace;font-size:17px}
+  .inputs{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;border-top:1px solid var(--rule);
+    padding-top:14px;margin-top:16px}
+  label{display:block;font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.08em;font-size:10.5px;color:var(--mute);margin-bottom:5px}
+  input[type=number],select{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--fg);
+    background:var(--ink);border:1px solid var(--rule);border-radius:2px;padding:7px 8px;width:88px}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid #6fa8dc;outline-offset:2px}
+
+  .find{width:100%;max-width:320px;margin:0 0 14px;font-family:'Archivo Narrow',sans-serif;
+    font-size:13px;letter-spacing:.04em}
+  .chips{display:flex;flex-direction:column;gap:9px;margin:0 0 16px}
+  .brand{display:grid;grid-template-columns:82px 1fr;align-items:start;gap:8px}
+  .brand[hidden]{display:none}
+  .brandChips{display:flex;flex-wrap:wrap;gap:8px}
+  .brandName{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;line-height:33px;
+    letter-spacing:.1em;text-transform:uppercase;color:#6b7783;text-align:right}
+  @media (max-width:640px){ .brand{grid-template-columns:1fr} .brandName{text-align:left;line-height:1.6} }
+  .chip{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:2px;padding:8px 11px;cursor:pointer;font-size:13px;color:var(--mute);
+    font-family:'Archivo Narrow',sans-serif;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .chip .dot{width:10px;height:10px;border-radius:50%;flex:none;opacity:.28}
+  .chip[aria-pressed="true"]{color:var(--fg);border-color:#3c4750;background:var(--panel2)}
+  .chip[aria-pressed="true"] .dot{opacity:1}
+  button{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--fg);background:transparent;border:1px solid var(--rule);
+    border-radius:2px;padding:7px 11px;cursor:pointer}
+  button[aria-pressed="false"]{color:var(--mute)}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+
+  figure{margin:0 0 10px;border:1px solid var(--rule);background:var(--panel);border-radius:2px;padding:6px}
+  svg{display:block;width:100%;height:auto}
+  figcaption{padding:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--mute);line-height:1.5}
+
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;min-width:680px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap;
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;font-variant-numeric:tabular-nums}
+  th{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+    font-size:10.5px;color:var(--mute)}
+  td.name,th.name{text-align:left;font-family:'Archivo',sans-serif;font-size:13px;position:sticky;left:0;background:var(--ink)}
+  td.name{display:flex;align-items:center;gap:8px}
+  .swatch{width:3px;height:15px;flex:none}
+  tbody tr:hover td,tbody tr:hover td.name{background:var(--panel2)}
+  tr.datum td{color:var(--mute);border-bottom:1px solid #39434c}
+  tr.datum td.name{color:var(--fg)}
+  .up{color:var(--up)} .low{color:var(--low)}
+  ul{padding-left:18px;margin:0}
+  li{margin:0 0 11px;font-size:14px;line-height:1.55;color:#b9c4cd;max-width:70ch}
+  li b{color:var(--fg);font-weight:600}
+  .note{font-size:12px;color:var(--mute);line-height:1.65;margin-top:24px;max-width:72ch}
+  .note b{color:#b9c4cd}
+
+  /* two cockpits side by side; each panel owns one bike's state */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  @media (max-width:760px){ .two{grid-template-columns:1fr} }
+  .two .panel{padding:14px}
+  .who{display:flex;align-items:center;gap:8px;margin:0 0 2px}
+  .who .swatch{height:13px}
+  .inputs{margin-top:12px;padding-top:12px}
+  .inputs.tight{gap:10px}
+  input[type=number],select{width:76px}
+  select.size{width:100%;margin-top:6px}
+  .sub{font-size:12px;color:var(--mute);line-height:1.55;margin:8px 0 0}
+  .sub b{color:#b9c4cd}
+  .solveOut{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mute);
+    line-height:1.6;margin:10px 0 0;border-top:1px solid var(--rule);padding-top:10px}
+  .solveOut b{color:var(--fg);font-weight:400}
+  tr.delta td{color:var(--fg);border-bottom:1px solid #39434c}
+  tr.delta td.name{font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.08em;font-size:11px;color:var(--mute)}
+  td.hi{color:var(--fg)}
+  table.dial{min-width:600px}
+  table.dial td:first-child+td,table.dial th:first-child+th{border-left:1px solid var(--rule)}
+  .neg{color:var(--low)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow"><a href="index.html" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)">← the whole shortlist</a> · two bikes, two cockpits, aligned at the bottom bracket</p>
+  <h1>Dialling in the SuperSomething against the Tutto</h1>
+  <p class="lede">The shortlist page fits one shared cockpit to thirty frames, which is what you want when you are still choosing. This one does the opposite: two frames, each with its own stem and spacer stack, so you can spec a SuperSomething build and see where it puts you relative to the bike you already ride. The Tutto's position is the thing to measure from — it is not a target the SuperSomething has to hit.</p>
+
+  <div class="two">
+    <section class="panel">
+      <p class="who"><span class="swatch" style="background:#f2f5f7"></span><span class="eyebrow">Reference · as you ride it</span></p>
+      <h3 class="mono" style="margin:6px 0 0;font-size:15px;font-weight:400">Cinelli Tutto Plus L</h3>
+      <div class="inputs tight">
+        <div><label for="aSp">Spacers</label><input id="aSp" type="number" value="35" step="2.5"></div>
+        <div><label for="aOh">Headset + clamp</label><input id="aOh" type="number" value="30" step="1"></div>
+        <div><label for="aStem">Stem</label><input id="aStem" type="number" value="80" step="5"></div>
+        <div><label for="aAng">Stem angle</label>
+          <select id="aAng"><option value="17">+17°</option><option value="12">+12°</option>
+            <option value="6" selected>+6°</option><option value="0">0°</option>
+            <option value="-6">−6°</option><option value="-12">−12°</option><option value="-17">−17°</option></select></div>
+      </div>
+      <p class="sub">35 mm of spacers below an 80 mm stem flipped to <b>+6°</b> — the bike as it stands in August 2026. The 2.5 mm spacer above the stem raises nothing, so it is not counted here.</p>
+    </section>
+
+    <section class="panel">
+      <p class="who"><span class="swatch" id="bSwatch" style="background:#4f8fb5"></span><span class="eyebrow">Build · what you'd order</span></p>
+      <select id="bSize" class="size" aria-label="SuperSomething size">
+        <option value="sklarML" selected>Sklar SuperSomething M-L · saddle 690–750</option>
+        <option value="sklarLG">Sklar SuperSomething L · saddle 730–795</option>
+        <option value="sklarXL">Sklar SuperSomething XL</option>
+      </select>
+      <div class="inputs tight">
+        <div><label for="bSp">Spacers</label><input id="bSp" type="number" value="0" step="2.5"></div>
+        <div><label for="bOh">Headset + clamp</label><input id="bOh" type="number" value="30" step="1"></div>
+        <div><label for="bStem">Stem</label><input id="bStem" type="number" value="90" step="5"></div>
+        <div><label for="bAng">Stem angle</label>
+          <select id="bAng"><option value="17">+17°</option><option value="12">+12°</option>
+            <option value="6">+6°</option><option value="0">0°</option>
+            <option value="-6" selected>−6°</option><option value="-12">−12°</option><option value="-17">−17°</option></select></div>
+      </div>
+      <div class="bar" style="margin:12px 0 0">
+        <button id="carryBtn">Your parts as they are</button>
+        <button id="matchHBtn">Match bar height</button>
+        <button id="matchBtn">Match bar exactly</button>
+      </div>
+      <p class="sub">Opens on the <b>M-L</b> — the L's 850 standover is above your inseam — with the build that matches the Tutto's reach: <b>no spacers, 90 mm stem, −6°</b>. Its bar still sits about 26 mm higher than the Tutto's, because the M-L's front end is taller. <b>Your parts as they are</b> copies the Tutto's cockpit across instead. Same <b>30 mm</b> overhead as the Tutto: full external routing and an ordinary EC34 top cup on a 1-1/8" straight steerer, so there is no routing cover under the stem and spacers can come out later without touching a hose. Sklar design it around a <b>50–100 mm stem</b>.</p>
+      <p class="solveOut" id="solveOut"></p>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:14px">
+    <div class="inputs tight" style="border-top:0;padding-top:0;margin-top:0">
+      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="718" step="1"></div>
+      <div><label for="ins">Inseam (mm)</label><input id="ins" type="number" value="840" step="5"></div>
+      <div><button id="wheelBtn" aria-pressed="false">Wheels</button></div>
+      <div><button id="datumBtn" aria-pressed="true">Jan 2026 datum</button></div>
+      <div><button id="resetBtn">Reset</button></div>
+    </div>
+    <p class="sub">Saddle height is the rider, not the frame, so it is shared. Each frame's seat angle then decides where that saddle sits fore and aft and how much post is out. Every control on this page is <b>remembered in this browser</b>, so a build you dialled in is still here tomorrow — <b>Reset</b> puts it back to the Tutto's own cockpit on both sides.</p>
+  </section>
+
+  <figure style="margin-top:20px">
+    <svg id="plot" role="img" aria-label="Side-view overlay of the Cinelli Tutto Plus and the selected Sklar SuperSomething, each with its own cockpit, aligned at the bottom bracket."></svg>
+    <figcaption id="cap"></figcaption>
+  </figure>
+
+  <h2>Where the bars land</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="name">Frame</th><th>Bar reach</th><th>Bar top</th><th>Drop</th>
+        <th>Saddle → bar</th><th>Axle ahead of hands</th><th>Post out</th></tr></thead>
+      <tbody id="fitRows"></tbody>
+    </table>
+  </div>
+  <p class="note"><b>Drop</b> is saddle top to bar top; a smaller number is a more upright bike. <b>Saddle → bar</b> is the straight-line distance the fit report measures. <b>Axle ahead of hands</b> is front axle minus bar centre — how much wheel is out in front of you, which is what changes when you size down a slack frame. Nothing here is a pass or a fail: a SuperSomething that sits you higher than the Tutto is describing a rougher-ground posture, which is what the frame is for.</p>
+
+  <h2>What it takes to match the Tutto's bar height</h2>
+  <div class="scroll">
+    <table class="dial">
+      <thead><tr><th class="name">Stem</th><th>+6°</th><th>0°</th><th>−6°</th><th>−12°</th><th>−17°</th>
+        <th>Bar reach</th><th>vs Tutto</th></tr></thead>
+      <tbody id="dialRows"></tbody>
+    </table>
+  </div>
+  <p class="note" id="dialNote"></p>
+
+  <h2>Frame and handling</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="name">Frame</th><th>Stack</th><th>Reach</th><th>S:R</th><th>ETT</th><th>Seat tube</th>
+        <th>HTA</th><th>STA</th><th>Chainstay</th><th>Front centre</th><th>Wheelbase</th><th>Trail</th>
+        <th>BB drop</th><th>Standover</th><th>Clearance</th></tr></thead>
+      <tbody id="geoRows"></tbody>
+    </table>
+  </div>
+
+  <h2>Reading</h2>
+  <ul id="findings"></ul>
+
+  <h2>What reviewers say</h2>
+  <ul>
+    <li><b>The Radavist, Spencer Harding, Jul 2026 — V2, size L, 780 mm saddle height.</b> The only review of the current frame, and the closest to your size. "Rides incredibly well," at the road-bike-with-big-tyres end of gravel; ran 700 × 53 tyres; the carbon fork "rode like a dream." His one con is that the stack is "a bit low" — but he normally rides an XL. He is a friend of Adam Sklar and calls it "mostly vibes-based." <a href="https://theradavist.com/sklar-supersomething-2-0-review-look-good-feel-good" style="color:var(--up)">Review</a></li>
+    <li><b>Bikepacking.com, Miles Arbour, Oct 2023 — V1, 60 cm.</b> Long front centre and 70.5° head angle, so it "tracks straight" and is stable fast, "a touch twitchy" slow. Bars "nearly level with the saddle" on a short stem. Lively, but "harsh" on fast rock and washboard against a Ritchey Outback, and "a touch flexy" with heavy panniers. Cons: price for 4130, no fork triple mounts, no dropper routing. <a href="https://bikepacking.com/bikes/sklar-super-something-review/" style="color:var(--up)">Review</a></li>
+    <li><b>The Radavist, Hailey Moore, Sep 2023 — V1, 54 cm.</b> "Remarkably smooth but not noodley," "playful without feeling sketchy." The offset and long front end help in tight corners; on slow steep climbs the front "almost imperceptibly noses around." Swapped the 90 mm stem for a 60. <a href="https://theradavist.com/sklar-bikes-supersomething-gravel-bike-review" style="color:var(--up)">Review</a></li>
+    <li><b>Bikerumor — V1, 58 cm.</b> Unverified, the page refused automated access: snippets say fit was good but the tester wanted a stem about 10 mm shorter, and it was "point-and-shoot" descending.</li>
+    <li><b>The pattern.</b> Stable tracking, a little low-speed wander, smooth steel that gets busy on hard chatter. Every reviewer went to a <em>shorter</em> stem than stock, which is worth weighing against the 80 mm this page starts from. Nobody compares it with the PBJ or the Terrel, and there are no substantive forum threads or video reviews yet.</li>
+  </ul>
+
+  <p class="note">
+    <b>Both frames are published data, not estimates.</b> The SuperSomething rows are Sklar's own chart from the frameset page (fetched Oct 2026). Sklar print a <b>front centre</b> and no wheelbase, so the front wheel is placed from it — and it closes: 665 mm on the L against their 55 mm fork offset derives 54.8, the M-L 55.3, the XL 55.9. Their effective top tubes fall out of stack, reach and the 73.5° seat angle to within half a millimetre on every size, and the 412 mm axle-to-crown lands where the axis says it should once a lower cup is added. The wheelbases in the table (1054 / 1081 / 1108) are derived from that front centre; the shortlist page used to carry 1058 / 1085 and has been corrected to match. The Tutto row is Cinelli's own chart, placed the same way from its 616 mm front centre.
+    <br><br>
+    <b>The two bikes are drawn on different reference tyres</b> — 692 mm on the Tutto, 718 on the SuperSomething, which is Sklar's 700 × 48 — so their ground lines and trail figures are each computed on their own wheel. Sklar print 69 mm of trail for the M-L, L and XL; the 68.8 here agrees. The steel fork is <b>412 mm axle-to-crown</b>, an ordinary rigid gravel length with no suspension correction, so the published stack is what you actually get.
+    <br><br>
+    <b>The Jan 2026 datum is dated, and the bike has moved since.</b> The 489 / 663 reference came off the Tutto in January, before you flipped the stem and settled on 35 mm of spacers, and its 545 / 80 were hand measurements. Your live position is the white row, not the grey one. The datum stays on the page as a fixed marker to read drift against, and the residual between the two is measurement uncertainty rather than anything the model is getting wrong.
+    <br><br>
+    <b>A negative figure in the dial-in table is not a spacer you can fit.</b> Read it as the amount the frame's own front end already stands above the Tutto's bar with the stem sitting as low as it goes — the SuperSomething is a taller-stack frame by design. The table is there so you can see the trade: a steeper negative angle buys height back, a longer stem spends it again, and reach moves with stem length almost independently of the angle you choose.
+    <br><br>
+    <b>Sizing.</b> Sklar size by saddle height, BB centre to saddle top: <b>L 730–795</b>, M-L 690–750, XL 780–845. Your saddle height, measured on the Tutto in Oct 2026, is <b>745 mm</b> — inside both the L and the top of the M-L, so both are real candidates. (The fit report's 775 would have put you outside the M-L; it was a hand measurement and 30 mm high.) Head angle is 70.5° on M-L, L and XL alike, so unlike the Terrel, sizing between them changes reach and stack but not trail. Standover isn't on Sklar's current chart; the figures in the table are the ones the shortlist already carried, of unrecorded source. Frameset facts: double-butted chromoly, 142 × 12 / 100 × 12 thru-axles, UDH, flat-mount brakes, 68 mm BSA, 27.2 post, 700 × 52 clearance, up to a 44T single ring, three bottle mounts, full external routing, 2520 g frame (L) and 1100 g uncut steel fork. Stock builds use a Ritchey Venturemax flared bar.
+  </p>
+</div>
+<script>
+const rad = d => d*Math.PI/180;
+const BAR_TOP = 15;
+
+/* Geometry is copied from the shortlist page, unchanged: Cinelli's own chart for
+   the Tutto (fc 616 and rake 45 both published, so the front wheel is placed
+   from the front centre) and Sklar's own chart for the SuperSomething, which
+   also prints front centre and offset rather than wheelbase. */
+const FRAMES = [
+  { id:'tutto', name:'Cinelli Tutto Plus L', short:'Tutto L', color:'#f2f5f7', ref:true,
+    stack:536, reach:410, ett:560, st:560, ht:110, hta:72, sta:74.5, drop:60, cs:425, fc:616,
+    standover:null, tire:692, rake:45 },
+  { id:'sklarML', name:'Sklar SuperSomething M-L', short:'SuperSomething M-L', color:'#8fbfd9',
+    stack:607, reach:386, ett:566, st:538, ht:166, hta:70.5, sta:73.5, drop:73, cs:426, fc:638,
+    standover:822, tire:718, rake:55 },
+  { id:'sklarLG', name:'Sklar SuperSomething L', short:'SuperSomething L', color:'#4f8fb5',
+    stack:629, reach:406, ett:592, st:575, ht:187, hta:70.5, sta:73.5, drop:73, cs:426, fc:665,
+    standover:850, tire:718, rake:55 },
+  { id:'sklarXL', name:'Sklar SuperSomething XL', short:'SuperSomething XL', color:'#2f6a8f',
+    stack:660, reach:421, ett:616, st:595, ht:222, hta:70.5, sta:73.5, drop:73, cs:426, fc:692,
+    standover:null, tire:718, rake:55 }
+];
+const F = {};
+for (const b of FRAMES){
+  F[b.id] = b;
+  b.R = b.tire/2;
+  b.bbh = b.R - b.drop;
+  b.rearX = -Math.sqrt(b.cs*b.cs - b.drop*b.drop);
+  if (b.fc != null){ b.frontX = Math.sqrt(b.fc*b.fc - b.drop*b.drop); b.wb = Math.round(b.frontX - b.rearX); }
+  else { b.frontX = b.wb + b.rearX; b.fc = Math.round(Math.hypot(b.frontX, b.drop)); }
+  b.htTop = { x:b.reach, y:b.stack };
+  b.htBot = { x:b.reach + b.ht*Math.cos(rad(b.hta)), y:b.stack - b.ht*Math.sin(rad(b.hta)) };
+  b.stTop = { x:-b.st*Math.cos(rad(b.sta)), y:b.st*Math.sin(rad(b.sta)) };
+  b.sr = b.stack/b.reach;
+  b.offset = b.rake;
+  b.trail = (b.R*Math.cos(rad(b.hta)) - b.offset)/Math.sin(rad(b.hta));
+}
+
+/* The January reference, kept as a dated marker rather than a target. */
+const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
+
+/* Two independent cockpits — the whole point of this page. A starts as the Tutto
+   as actually ridden; B starts as the same parts moved across, so the first thing
+   you see is what bolting your own cockpit onto the SuperSomething would do. */
+let cockA, cockB, saddleY, inseam, showWheels, showDatum, bId;
+const A = () => F.tutto, Bf = () => F[bId];
+
+/* Saved in this browser so a half-dialled build survives closing the tab —
+   localStorage rather than sessionStorage, since the point is to come back to it
+   another day. Storage is per-origin, so a file:// copy and a deployed copy keep
+   separate state. Anything unreadable or out of range falls back to the default
+   rather than throwing, because a stuck bad value would be invisible and sticky. */
+const KEY = 'bike-geo.sklar.v2';
+const ANGLES = [17,12,6,0,-6,-12,-17];
+/* B opens on the M-L with the build that matches the Tutto's bar reach: 0 mm of
+   spacers, 90 mm stem, −6° (Oct 2026, after the L was ruled out on standover).
+   v1 stored the old L / copy-of-A defaults, hence the key bump. The SuperSomething routes everything
+   externally and takes an ordinary EC34 top cup, so its overhead is the shared
+   30 — nothing under the stem that the Terrel's routing cover would add. */
+const defaults = () => ({
+  cockA: { spacers:35, overhead:30, stem:80, angle:6 },
+  cockB: { spacers:0, overhead:30, stem:90, angle:-6 },
+  saddleY:718, inseam:840, showWheels:false, showDatum:true, bId:'sklarML' });
+
+const num = (v,fb,lo,hi) => (typeof v === 'number' && isFinite(v) && v >= lo && v <= hi) ? v : fb;
+function cleanCock(c,fb){
+  c = c || {};
+  return { spacers: num(c.spacers, fb.spacers, -100, 200),
+           overhead: num(c.overhead, fb.overhead, 0, 100),
+           stem: num(c.stem, fb.stem, 20, 200),
+           angle: ANGLES.includes(c.angle) ? c.angle : fb.angle };
+}
+function apply(st){
+  const d = defaults();
+  cockA = cleanCock(st.cockA, d.cockA);
+  cockB = cleanCock(st.cockB, d.cockB);
+  /* 743 was the old default, derived from the January 2026 fit report. A stored
+     743 is that default left untouched, not a choice, so it moves to the Oct 2026
+     measurement; anything else the slider was set to is kept. */
+  saddleY = st.saddleY === 743 ? d.saddleY : num(st.saddleY, d.saddleY, 500, 1000);
+  inseam = num(st.inseam, d.inseam, 500, 1100);
+  showWheels = st.showWheels === true;
+  showDatum = st.showDatum !== false;
+  bId = F[st.bId] && st.bId !== 'tutto' ? st.bId : d.bId;
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify({ cockA, cockB, saddleY, inseam, showWheels, showDatum, bId })); }
+  catch (e) { /* private mode, or storage disabled: the page still works, it just forgets */ }
+}
+function load(){
+  let st = {};
+  try { st = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { st = {}; }
+  apply(st);
+}
+
+function fit(b,c){
+  const H = rad(b.hta), th = rad(90 - b.hta + c.angle);
+  const r = c.spacers + c.overhead;
+  const clamp = { x:b.reach - r*Math.cos(H), y:b.stack + r*Math.sin(H) };
+  const bar = { x:clamp.x + c.stem*Math.cos(th), y:clamp.y + c.stem*Math.sin(th) };
+  const barTop = bar.y + BAR_TOP;
+  const S = rad(b.sta);
+  return { clamp, bar, barTop, rise:r,
+    drop: saddleY - barTop,
+    s2b: Math.hypot(bar.x - DATUM.saddleRefX, barTop - saddleY),
+    ahead: b.frontX - bar.x,
+    axis: { x:-saddleY/Math.tan(S), y:saddleY },
+    post: saddleY/Math.sin(S) - b.st };
+}
+
+/* Cockpit solves. These are readouts, not verdicts: a negative spacer figure is
+   a description of how much higher the frame's own front end already sits, not
+   a build you are supposed to fit. */
+function spacersFor(b,c,stem,angle,ty){
+  const H = rad(b.hta), th = rad(90 - b.hta + angle);
+  return (ty - b.stack - stem*Math.sin(th))/Math.sin(H) - c.overhead;
+}
+function barXat(b,c,stem,angle,ty){
+  const H = rad(b.hta), th = rad(90 - b.hta + angle);
+  const r = (ty - b.stack - stem*Math.sin(th))/Math.sin(H);
+  return b.reach - r*Math.cos(H) + stem*Math.cos(th);
+}
+/* stem and spacers that land the bar clamp exactly on (tx,ty) at a fixed angle.
+   Two equations, two unknowns; the determinant is cos(angle), so it only fails
+   at a physically meaningless ±90° stem. */
+function solveBoth(b,c,angle,tx,ty){
+  const H = rad(b.hta), th = rad(90 - b.hta + angle);
+  const a11 = -Math.cos(H), a12 = Math.cos(th), a21 = Math.sin(H), a22 = Math.sin(th);
+  const d1 = tx - b.reach, d2 = ty - b.stack, det = a11*a22 - a12*a21;
+  return { spacers: (d1*a22 - a12*d2)/det - c.overhead, stem: (a11*d2 - d1*a21)/det };
+}
+
+/* ---------- drawing ---------- */
+const PAD = { l:70, r:150, t:64, b:104 };
+const minX = Math.min(...FRAMES.map(b=>b.rearX - b.R));
+const maxX = Math.max(...FRAMES.map(b=>b.frontX + b.R));
+const minY = -Math.max(...FRAMES.map(b=>b.bbh));
+const maxY = 800;
+const W = (maxX-minX) + PAD.l + PAD.r, H = (maxY-minY) + PAD.t + PAD.b;
+const X = x => (x - minX) + PAD.l, Y = y => (maxY - y) + PAD.t;
+const NS = 'http://www.w3.org/2000/svg';
+function el(t,a,x){const n=document.createElementNS(NS,t);for(const k in a)if(a[k]!=null)n.setAttribute(k,a[k]);
+  if(x!=null)n.textContent=x;return n;}
+function poly(p,pts,o={}){const n=el('polyline',Object.assign({
+  points:pts.map(q=>X(q.x).toFixed(1)+','+Y(q.y).toFixed(1)).join(' '),fill:'none',
+  'stroke-linecap':'round','stroke-linejoin':'round','vector-effect':'non-scaling-stroke'},o));
+  p.appendChild(n);return n;}
+const svg = document.getElementById('plot');
+
+function draw(){
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.innerHTML='';
+  const pairs = [[A(),cockA],[Bf(),cockB]];
+  const fa = fit(A(),cockA);
+
+  svg.appendChild(el('line',{x1:X(0),y1:Y(maxY),x2:X(0),y2:Y(minY),stroke:'#1e252b','stroke-width':1,
+    'stroke-dasharray':'2 8','vector-effect':'non-scaling-stroke'}));
+
+  /* The Tutto's bar height and the January datum can land within 20 mm of each
+     other, so their labels are parked at different x rather than stacked. */
+  const rule = (y,label,col,dash,xoff=6) => {
+    svg.appendChild(el('line',{x1:X(minX),y1:Y(y),x2:X(maxX),y2:Y(y),stroke:col,'stroke-width':1,
+      'stroke-dasharray':dash,'vector-effect':'non-scaling-stroke'}));
+    svg.appendChild(el('text',{x:X(minX)+xoff,y:Y(y)-12,fill:col,'font-size':21,'letter-spacing':1.5,
+      'font-family':'Archivo Narrow, sans-serif','font-weight':700}, label));
+  };
+  rule(saddleY,'SADDLE TOP','#39434c','10 8');
+  rule(fa.barTop,'TUTTO BAR TOP · '+Math.round(fa.drop)+' MM DROP','#8b98a4','10 8',480);
+  if (showDatum){
+    rule(DATUM.barTop,'JAN 2026 DATUM · '+DATUM.drop+' MM DROP','#39434c','3 7');
+    svg.appendChild(el('circle',{cx:X(DATUM.barX),cy:Y(DATUM.barTop),r:13,fill:'none',stroke:'#8b98a4',
+      'stroke-width':1.2,opacity:.8,'vector-effect':'non-scaling-stroke'}));
+  }
+
+  /* two frames land close together often enough that the labels need nudging */
+  const placed = [];
+  const labelY = (x,y) => { let ny = y;
+    for (let hit = true; hit; ) { hit = false;
+      for (const p of placed) if (Math.abs(p.x-x) < 150 && Math.abs(p.y-ny) < 22){ ny += 25; hit = true; break; } }
+    placed.push({x,y:ny}); return ny; };
+
+  /* Standover: each frame's published figure as a thick tick over the middle of
+     its top tube, measured up from that frame's own ground line, labelled with
+     the clearance it leaves at the inseam. The inseam itself is one rule, drawn from the average of
+     the two ground lines, which sit within a couple of millimetres here. */
+  const sFrames = pairs.map(p=>p[0]);
+  const gnd = sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
+  svg.appendChild(el('line',{x1:X(minX),y1:Y(inseam-gnd),x2:X(maxX),y2:Y(inseam-gnd),stroke:'#5c6873','stroke-width':1,
+    'stroke-dasharray':'2 6','vector-effect':'non-scaling-stroke'}));
+  svg.appendChild(el('text',{x:X(minX)+6,y:Y(inseam-gnd)+28,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
+    'font-family':'Archivo Narrow, sans-serif','font-weight':700}, 'INSEAM '+inseam));
+  for (const b of sFrames){
+    if (!b.standover) continue;
+    const sy = b.standover - b.bbh, sx = (b.stTop.x + b.htTop.x)/2;
+    poly(svg,[{x:sx,y:-b.bbh},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
+    poly(svg,[{x:sx-50,y:sy},{x:sx+50,y:sy}],{stroke:b.color,'stroke-width':4,opacity:.9});
+    svg.appendChild(el('text',{x:X(sx)+56,y:labelY(X(sx)+56,Y(sy)+8),fill:b.color,'font-size':20,opacity:.9,
+      'font-family':'JetBrains Mono, monospace'}, b.standover+' so · '+sgn(inseam-b.standover)));
+  }
+
+  for (const [b,c] of pairs){
+    const g = el('g',{}); svg.appendChild(g);
+    const w = b.ref ? 1.6 : 2.3, dash = b.ref ? '9 6' : null, f = fit(b,c);
+
+    if (showWheels) for (const ax of [{x:b.rearX,y:b.drop},{x:b.frontX,y:b.drop}])
+      g.appendChild(el('circle',{cx:X(ax.x),cy:Y(ax.y),r:b.R,stroke:b.color,fill:'none',
+        'stroke-width':1,opacity:.2,'vector-effect':'non-scaling-stroke'}));
+    g.appendChild(el('line',{x1:X(b.rearX-b.R),y1:Y(-b.bbh),x2:X(b.frontX+b.R),y2:Y(-b.bbh),
+      stroke:b.color,'stroke-width':1,opacity:.22,'stroke-dasharray':'14 10','vector-effect':'non-scaling-stroke'}));
+
+    poly(g,[b.stTop,b.htTop,b.htBot],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[b.htBot,{x:0,y:0},b.stTop],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[{x:0,y:0},{x:b.rearX,y:b.drop},b.stTop],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+    poly(g,[b.htBot,{x:b.frontX,y:b.drop}],{stroke:b.color,'stroke-width':w,'stroke-dasharray':dash});
+
+    const gy = -b.bbh, axg = b.frontX + b.trail;
+    poly(g,[b.htTop,{x:axg,y:gy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'3 6',opacity:.45});
+    poly(g,[{x:b.frontX,y:gy},{x:axg,y:gy}],{stroke:b.color,'stroke-width':4,opacity:.9});
+    g.appendChild(el('text',{x:X(b.frontX)+4,y:labelY(X(b.frontX)+4,Y(gy)+30),fill:b.color,'font-size':21,opacity:.9,
+      'font-family':'JetBrains Mono, monospace'}, b.trail.toFixed(0)+' trail'));
+
+    poly(g,[b.stTop,f.axis],{stroke:b.color,'stroke-width':1.4,'stroke-dasharray':'5 5',opacity:.85});
+    poly(g,[b.htTop,f.clamp,f.bar],{stroke:b.color,'stroke-width':1.6,'stroke-dasharray':'5 5'});
+    g.appendChild(el('circle',{cx:X(f.bar.x),cy:Y(f.bar.y),r:5.5,fill:b.color}));
+    g.appendChild(el('text',{x:X(f.bar.x)+16,y:labelY(X(f.bar.x)+16,Y(f.bar.y)+7),fill:b.color,'font-size':22,
+      'font-family':'JetBrains Mono, monospace'}, Math.round(f.drop)+' mm'));
+  }
+
+  const bb = el('g',{stroke:'#e7ecf0','stroke-width':1.6}); svg.appendChild(bb);
+  bb.appendChild(el('line',{x1:X(0)-13,y1:Y(0),x2:X(0)+13,y2:Y(0),'vector-effect':'non-scaling-stroke'}));
+  bb.appendChild(el('line',{x1:X(0),y1:Y(0)-13,x2:X(0),y2:Y(0)+13,'vector-effect':'non-scaling-stroke'}));
+
+  const say = c => `${n0(c.spacers)} mm of spacers, ${n0(c.spacers+c.overhead)} mm to the clamp, ${n0(c.stem)} mm stem at ${ang(c.angle)}`;
+  document.getElementById('cap').textContent =
+    `${A().name}, dashed, as you ride it: ${say(cockA)}. ${Bf().name}, solid: ${say(cockB)}. `+
+    `The dot is the bar clamp centre and the number beside it is the saddle-to-bar drop that results. `+
+    `The grey rule is your saddle top, the lighter one the Tutto's bar top`+
+    (showDatum ? `, the dotted one the January datum with its bar position ringed.` : `.`);
+}
+
+/* ---------- tables ---------- */
+const n0 = v => Math.round(v);
+const sgn = v => (Math.abs(v) < .5 ? '±0' : (v>0?'+':'−') + Math.abs(Math.round(v)));
+const ang = a => (a>0?'+':a<0?'−':'') + Math.abs(a) + '°';
+const nameCell = (b,label) => `<td class="name"><span class="swatch" style="background:${b.color}"></span>${label ?? b.name}</td>`;
+
+function tables(){
+  const b = Bf(), fa = fit(A(),cockA), fb = fit(b,cockB);
+  const rows = [
+    `<tr>${nameCell(A(),A().name+' · as ridden')}<td class="hi">${n0(fa.bar.x)}</td><td class="hi">${n0(fa.barTop)}</td>
+      <td>${n0(fa.drop)}</td><td>${n0(fa.s2b)}</td><td>${n0(fa.ahead)}</td><td>${n0(fa.post)}</td></tr>`,
+    `<tr>${nameCell(b,b.name+' · this build')}<td class="hi">${n0(fb.bar.x)}</td><td class="hi">${n0(fb.barTop)}</td>
+      <td>${n0(fb.drop)}</td><td>${n0(fb.s2b)}</td><td>${n0(fb.ahead)}</td><td>${n0(fb.post)}</td></tr>`,
+    `<tr class="delta">${nameCell({color:'#39434c'},'Sklar − Tutto')}<td>${sgn(fb.bar.x-fa.bar.x)}</td>
+      <td>${sgn(fb.barTop-fa.barTop)}</td><td>${sgn(fb.drop-fa.drop)}</td><td>${sgn(fb.s2b-fa.s2b)}</td>
+      <td>${sgn(fb.ahead-fa.ahead)}</td><td>${sgn(fb.post-fa.post)}</td></tr>`];
+  if (showDatum) rows.push(`<tr class="datum">${nameCell({color:'#39434c'},'Jan 2026 datum')}
+    <td>${DATUM.barX}</td><td>${DATUM.barTop}</td><td>${DATUM.drop}</td><td>${DATUM.s2b}</td><td>—</td><td>—</td></tr>`);
+  document.getElementById('fitRows').innerHTML = rows.join('');
+
+  /* Dial-in: hold the Tutto's bar height, vary stem length, and read off the
+     steerer height each stem angle would need. Reach barely moves with angle,
+     so it gets one column at the angle currently selected. */
+  const ty = fit(A(),cockA).bar.y, angles = [6,0,-6,-12,-17];
+  document.getElementById('dialRows').innerHTML = [60,70,80,90,100,110,120].map(stem=>{
+    const cells = angles.map(a=>{
+      const sp = spacersFor(b,cockB,stem,a,ty);
+      return `<td class="${sp < 0 ? 'neg' : ''}">${sgn(sp)}</td>`;
+    }).join('');
+    const bx = barXat(b,cockB,stem,cockB.angle,ty), d = bx - fit(A(),cockA).bar.x;
+    const cls = Math.abs(d) < 8 ? 'hi' : '';
+    return `<tr><td class="name">${stem} mm</td>${cells}<td>${n0(bx)}</td><td class="${cls}">${sgn(d)}</td></tr>`;
+  }).join('');
+  document.getElementById('dialNote').innerHTML =
+    `Each cell is the spacer height that would put the <b>${b.short}</b>'s bar top level with the Tutto's, at that stem length and angle — negative figures included, because they say how much higher the frame already sits. `+
+    `<b>Bar reach</b> is where the bar lands once the height matches, shown for the ${ang(cockB.angle)} you have selected; it moves less than a millimetre between angles, so reach is a stem-length decision and height is a spacer-and-angle one. `+
+    `Sklar design this frame around a 50–100 mm stem, so rows outside that are for reference.`;
+
+  document.getElementById('geoRows').innerHTML = FRAMES.map(x=>`<tr>${nameCell(x)}
+    <td>${n0(x.stack)}</td><td>${n0(x.reach)}</td><td>${x.sr.toFixed(2)}</td><td>${n0(x.ett)}</td>
+    <td>${n0(x.st)}</td><td>${x.hta}°</td><td>${x.sta}°</td><td>${x.cs}</td><td>${x.fc}</td><td>${x.wb}</td>
+    <td>${x.trail.toFixed(1)}</td><td>${x.drop}</td><td>${x.standover ?? '—'}</td><td>${x.standover ? sgn(inseam - x.standover) : '—'}</td></tr>`).join('');
+
+  solveLine();
+  findings();
+}
+
+function solveLine(){
+  const b = Bf(), fa = fit(A(),cockA);
+  const s = solveBoth(b,cockB,cockB.angle,fa.bar.x,fa.bar.y);
+  const h = spacersFor(b,cockB,cockB.stem,cockB.angle,fa.bar.y);
+  const slammed = fit(b,Object.assign({},cockB,{spacers:0})).barTop - fa.barTop;
+  document.getElementById('solveOut').innerHTML =
+    `Bar height alone, keeping the ${n0(cockB.stem)} mm stem at ${ang(cockB.angle)}: <b>${sgn(h)} mm of spacers</b>.<br>`+
+    `Both height and reach at ${ang(cockB.angle)}: <b>${sgn(s.spacers)} mm of spacers with a ${s.stem.toFixed(0)} mm stem</b>.`+
+    (h < -0.5 ? `<br>The buttons stop at zero spacers, which leaves this bar <b>${sgn(slammed)} mm</b> against the Tutto's.` : ``);
+}
+
+function findings(){
+  const b = Bf(), fa = fit(A(),cockA), fb = fit(b,cockB), li = [];
+  const ty = fa.bar.y;
+  const slam = id => spacersFor(F[id],cockB,90,-6,ty);
+
+  li.push(`<b>This build against your bike.</b> ${b.short} lands its bar ${sgn(fb.bar.x-fa.bar.x)} mm on reach and
+    ${sgn(fb.barTop-fa.barTop)} mm on height, for ${n0(fb.drop)} mm of drop against the Tutto's ${n0(fa.drop)}.
+    Saddle to bar goes ${n0(fa.s2b)} → ${n0(fb.s2b)}.`);
+
+  /* How low each size's cockpit goes: stem at −6°, no spacers. Everything above
+     that height is a spacer away. */
+  const floor = id => fit(F[id],Object.assign({},cockB,{spacers:0,stem:90,angle:-6})).barTop - fa.barTop;
+  li.push(`<b>How low each size can be set.</b> With a 90 mm stem at −6° and no spacers, the M-L's bar sits
+    <b>${sgn(floor('sklarML'))} mm</b> against your current one, the L's <b>${sgn(floor('sklarLG'))} mm</b> and the
+    XL's <b>${sgn(floor('sklarXL'))} mm</b>. Those are the bottoms of the adjustment windows. Matching the Tutto's
+    height exactly from there asks for ${sgn(slam('sklarML'))} mm of spacers on the M-L and ${sgn(slam('sklarLG'))} on the L.`);
+
+  li.push(`<b>A little more wheel in front of you, a little more trail.</b> Front centre ${A().fc} → ${b.fc} mm,
+    trail ${A().trail.toFixed(0)} → ${b.trail.toFixed(0)} mm, on ${A().hta}° against ${b.hta}° with a 55 mm offset fork.
+    That is a smaller step than the Terrel's 78: Sklar call it about 60% of the way from road bike to hardtail, and
+    the numbers agree — steadier than the Tutto loaded, still quick to turn. Axle ahead of hands goes
+    ${n0(fa.ahead)} → ${n0(fb.ahead)} mm with this build.`);
+
+  li.push(`<b>Seatpost and standover.</b> At a ${n0(saddleY)} mm saddle top the Tutto leaves ${n0(fa.post)} mm of post
+    out of a ${A().st} mm seat tube; ${b.short} leaves ${n0(fb.post)} of a ${b.st}. Standover on the
+    ${b.short} is ${b.standover ? b.standover+' mm, leaving '+sgn(inseam - b.standover)+' mm of clearance at your '+inseam+' mm inseam' : 'not published'}; Cinelli print none for the Tutto, so there is nothing to hold it against.`);
+
+  document.getElementById('findings').innerHTML = li.map(t=>`<li>${t}</li>`).join('');
+}
+
+/* ---------- controls ---------- */
+const $ = id => document.getElementById(id);
+function sync(){
+  $('aSp').value = cockA.spacers; $('aOh').value = cockA.overhead; $('aStem').value = cockA.stem; $('aAng').value = cockA.angle;
+  $('bSp').value = cockB.spacers; $('bOh').value = cockB.overhead; $('bStem').value = cockB.stem; $('bAng').value = cockB.angle;
+  $('sh').value = saddleY; $('ins').value = inseam;
+  $('bSize').value = bId;
+  $('bSwatch').style.background = Bf().color;
+  $('wheelBtn').setAttribute('aria-pressed', String(showWheels));
+  $('datumBtn').setAttribute('aria-pressed', String(showDatum));
+}
+for (const [id,fn] of [['aSp',v=>cockA.spacers=v],['aOh',v=>cockA.overhead=v],['aStem',v=>cockA.stem=v],
+                       ['bSp',v=>cockB.spacers=v],['bOh',v=>cockB.overhead=v],['bStem',v=>cockB.stem=v],
+                       ['sh',v=>saddleY=v],['ins',v=>inseam=v]])
+  $(id).addEventListener('input',e=>{ const v=parseFloat(e.target.value); if(!isNaN(v)){ fn(v); render(); } });
+for (const [id,c] of [['aAng',()=>cockA],['bAng',()=>cockB]])
+  $(id).addEventListener('change',e=>{ c().angle = parseFloat(e.target.value); render(); });
+$('bSize').addEventListener('change',e=>{ bId = e.target.value; sync(); render(); });
+/* Carrying the parts across moves spacers, stem and angle — but not the
+   overhead, which belongs to the frame's headset and routing, not to the parts. */
+$('carryBtn').addEventListener('click',()=>{
+  cockB = Object.assign({}, cockA, { overhead: cockB.overhead }); sync(); render(); });
+$('matchHBtn').addEventListener('click',()=>{
+  const sp = spacersFor(Bf(),cockB,cockB.stem,cockB.angle,fit(A(),cockA).bar.y);
+  cockB.spacers = Math.max(0, Math.round(sp*2)/2); sync(); render();
+});
+$('matchBtn').addEventListener('click',()=>{
+  const s = solveBoth(Bf(),cockB,cockB.angle,fit(A(),cockA).bar.x,fit(A(),cockA).bar.y);
+  cockB.stem = Math.round(s.stem/5)*5;
+  cockB.spacers = Math.max(0, Math.round(s.spacers*2)/2); sync(); render();
+});
+$('wheelBtn').addEventListener('click',()=>{ showWheels=!showWheels; sync(); render(); });
+$('datumBtn').addEventListener('click',()=>{ showDatum=!showDatum; sync(); render(); });
+$('resetBtn').addEventListener('click',()=>{
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  apply(defaults()); sync(); render();
+});
+
+function render(){ draw(); tables(); save(); }
+load(); sync(); render();
+</script>
+</body>
+</html>

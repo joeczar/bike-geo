@@ -128,6 +128,32 @@ is not moved to make a row agree. But its residual against the Tutto row is
 current, carefully taken reading of Joe's position ever arrives, add it as a
 second dated reference rather than editing the January one.
 
+**Saddle height, re-measured Oct 2026: 745 mm, not 775.** Joe taped it on the
+Tutto, BB centre to saddle top along the seat tube (photo, tape draped over the
+saddle's side, so ±10 mm). That matches his **84 cm inseam** (× 0.883 ≈ 742) and
+confirms the report's 775 was a hand measurement ~30 mm high. It is now the
+**page default** on all three pages — `saddleY` **718** (vertical; 745 × sin
+74.5°), in both the `sh` input value and the state initialiser, which must stay
+in step. At Joe's request the datum panel on `index.html` shows it too: its
+saddle cell reads **Saddle height · Oct 2026: 745** (along the seat tube) in
+place of the old 743. The rest of that panel — bar 489 / 663, drop 80, saddle to
+bar 545 — is still the January datum, and `DATUM` in the script is unchanged.
+On the two dial-in pages a stored
+saddle top of exactly 743 is the old untouched default and is migrated to 718 on
+load; anything else is kept. Drop that migration if 743 ever becomes deliberate.
+
+**Inseam 840** is an input on all three pages (persisted on the dial-in pages),
+and the geometry tables carry a **Clearance** column, inseam minus published
+standover, signed, blank where no standover is published. Do not derive missing
+standovers from stack/reach/seat tube: tried Oct 2026, a straight top tube at its
+midpoint misses published figures by 16–75 mm (bent and sloping tubes, seat tubes
+extending past the junction). The Tutto's standover is unpublished; a tape
+reading off Joe's bike is the only good source.
+On the drawing, each published standover is a thick tick over the middle of
+that frame's top tube, measured from its own ground line and labelled
+`850 so · −10` (standover · clearance). The inseam is one dotted rule, measured
+from the average ground line of the frames on show.
+
 The saddle is modelled per-frame: fixed saddle-top height, so each frame's seat
 angle decides the fore/aft position and the exposed post length. Earlier versions
 plotted a single floating point 50 mm behind the BB, which was wrong — that 50 is
@@ -283,10 +309,10 @@ fine.
   SuperSomething.
 - **Sklar's fit windows** — Sklar size by saddle height *and* saddle-to-bar, the
   same two numbers as the datum, which makes them directly checkable. PBJ L is
-  saddle height 730–790 and saddle to stem 530–570; the datum's 775 / 545 sits
-  mid-window, and the M is outside both. SuperSomething L is 730–795, its M-L
-  tops out at 750 — so `sklarML` is below the datum's range and is on the page
-  for shape comparison, not as a candidate. Sklar measure saddle *tip* to stem
+  saddle height 730–790 and saddle to stem 530–570; Joe's measured 745 and the
+  report's 545 sit inside both, and the M is outside. SuperSomething L is
+  730–795 and M-L 690–750, so at 745 **both are candidates** — the old "M-L is
+  only for shape" line came from the wrong 775 and is gone. Sklar measure saddle *tip* to stem
   centre; the fit report measures saddle to bar. Close, not identical.
 - **Standert Erdgeschoss 58 / 60 ‡** — Standert's own chart (stainless frameset
   page), which prints no BB drop. The fork rake is selectable 47 or 52 mm;
@@ -397,6 +423,30 @@ Terrel — where `index.html` holds one shared one plus per-frame overrides.
   `index.html`, they are not the source of truth. The **Reset** button clears the
   key and re-saves the defaults. Storage is per-origin, so a `file://` copy and a
   deployed copy keep separate state.
+
+## The SuperSomething dial-in page
+
+`sklar.html`, added Oct 2026 when Joe leaned back to the Sklar. A copy of
+`terrel.html` with the Terrels swapped for SuperSomething M-L / L / XL — same
+model, same solves, so **a geometry or model fix now goes in three files**.
+
+- Rows are Sklar's current (V2) chart from the frameset page, fetched Oct 2026.
+  Sklar print **front centre**, not wheelbase, so the rows carry `fc`; it closes
+  against their 55 mm offset within 1 mm on every size. `index.html` used to
+  carry `wb` 1058 / 1085, ~4 mm long — corrected to `fc` 638 / 665 there too.
+- Overhead is the shared **30**: full external routing, EC34 top cup, no
+  routing cover. Panel B opens on the **M-L** with **0 spacers, 90 mm stem, −6°**
+  — the build that lands the bar at the Tutto's reach (Oct 2026). Joe ruled the L
+  out on standover: 850 is above his 840 inseam, and he already hits the Tutto's
+  top tube. That bar sits ~26 mm above the Tutto's; it is a description, not a
+  shortfall.
+- Sizing is Sklar's saddle-height calculator: L 730–795, M-L 690–750, XL 780–845.
+  At Joe's measured 745 both the L and the M-L fit.
+- Standover is not on the current chart; the 822 / 850 are the shortlist's old
+  figures, source unrecorded. XL left blank.
+- Reviews are summarised on the page (Radavist V2 Jul 2026, Bikepacking.com and
+  Radavist V1 2023). Every reviewer fitted a shorter stem than stock.
+- State key `bike-geo.sklar.v2` (bumped from v1 so the M-L defaults appear).
 
 ## Adding a frame
 

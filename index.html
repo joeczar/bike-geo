@@ -90,7 +90,7 @@
   <section class="panel">
     <p class="eyebrow">Datum · your position from the Fairlight report, 9 Jan 2026</p>
     <dl class="grid">
-      <div class="m"><dt>Saddle top</dt><dd>743</dd></div>
+      <div class="m"><dt>Saddle height · Oct 2026</dt><dd>745</dd></div>
       <div class="m"><dt>Bar top</dt><dd>663</dd></div>
       <div class="m"><dt>Bar reach</dt><dd>489</dd></div>
       <div class="m"><dt>Drop</dt><dd>80</dd></div>
@@ -103,7 +103,8 @@
       <div><label for="sa">Stem angle</label>
         <select id="sa"><option value="0">0°</option><option value="-6">−6°</option>
         <option value="-12">−12°</option><option value="-17">−17°</option><option value="6" selected>+6°</option></select></div>
-      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="743" step="1"></div>
+      <div><label for="sh">Saddle top (mm)</label><input id="sh" type="number" value="718" step="1"></div>
+      <div><label for="ins">Inseam (mm)</label><input id="ins" type="number" value="840" step="5"></div>
       <div><label for="apr">Aero pad rise</label><input id="apr" type="number" value="45" step="5"></div>
       <div><label for="aex">Aero extension</label><input id="aex" type="number" value="200" step="10"></div>
       <div><label for="atl">Extension tilt</label><input id="atl" type="number" value="10" step="5"></div>
@@ -158,7 +159,7 @@
   <div class="scroll">
     <table>
       <thead><tr><th class="name">Frame</th><th>Stack</th><th>Reach</th><th>S:R</th><th>ETT</th><th>Seat tube</th>
-        <th>HTA</th><th>STA</th><th>Chainstay</th><th>Wheelbase</th><th>Trail</th><th>BB drop</th><th>Standover</th></tr></thead>
+        <th>HTA</th><th>STA</th><th>Chainstay</th><th>Wheelbase</th><th>Trail</th><th>BB drop</th><th>Standover</th><th>Clearance</th></tr></thead>
       <tbody id="geoRows"></tbody>
     </table>
   </div>
@@ -175,7 +176,7 @@
     <br><br>
     The stem is the thing to hold in mind when reading its bar position. Sklar design the PBJ around a <b>30–50 mm stem</b> and ship complete builds with a 35, paired with their swept-back riser bar, which pulls the hands back again. This page fits a 90 mm stem to every frame, so the PBJ's bar is drawn something like 55 mm further forward than Sklar intend, before any bar sweep. They also say outright that a drop bar on a PBJ is possible but hard to fit well, and point drop-bar riders at the SuperSomething instead. It's a rigid 29er on a 29 × 2.6 reference tyre.
     <br><br>
-    Sklar size by the same two numbers this page is built on. For a 775 mm saddle height and a 545 mm saddle-to-bar, their chart puts you on the <b>L</b> — saddle height 730–790, saddle to stem 530–570, so 545 sits mid-window — and the M is outside both ranges. Their SuperSomething chart says the same: L is 730–795, the M-L tops out at 750. Sklar measure saddle <em>tip</em> to stem centre where the fit report measures saddle to bar, so treat that as close, not identical.
+    Sklar size by the same two numbers this page is built on. Your saddle height, measured on the Tutto in Oct 2026, is <b>745 mm</b> (the fit report's 775 was 30 mm high). Their PBJ chart puts that on the <b>L</b> — saddle height 730–790, saddle to stem 530–570, so the report's 545 sits mid-window — with the M outside both ranges. On the SuperSomething, 745 sits in the L (730–795) and near the top of the M-L (690–750), so both fit. Sklar measure saddle <em>tip</em> to stem centre where the fit report measures saddle to bar, so treat that as close, not identical.
     <br><br>
     <b>‡ Standert.</b> Both charts are Standert's own, and both stop short of the two numbers this page needs for the front wheel: neither prints BB drop, and only the Erdgeschoss prints an offset. The Erdgeschoss fork is a Columbus Cross+ with a rake you choose at 47 or 52 mm; closing the published wheelbase against the 52 mm setting wants 75 mm of BB drop, and that same 75 reproduces 52.0 mm on the 58 and 51.5 on the 60 — consistent enough to trust, and the ordinary figure for a gravel frame. Its 425 mm chainstay is the shortest position of a sliding dropout. The Kreissäge RS prints neither, so 70 mm of drop is assumed as the road standard, which then derives 43.5–43.9 mm of offset — normal for a 73.5° race frame, but it is an assumption, not a published figure. Drawn on a 32 mm reference tyre against a 35 mm maximum, where the Erdgeschoss gets the 45 mm everything else here uses.
     <br><br>
@@ -248,10 +249,10 @@ const BIKES = [
     stack:632, reach:430, ett:617, st:570, ht:177, hta:71.5, sta:73.5, drop:72, cs:435, wb:1094,
     standover:862, tire:712, rake:45 },
   { id:'sklarML', brand:'Sklar', name:'Sklar SuperSomething M/L', color:'#8fbfd9', on:false,
-    stack:607, reach:386, ett:566, st:538, ht:166, hta:70.5, sta:73.5, drop:73, cs:426, wb:1058,
+    stack:607, reach:386, ett:566, st:538, ht:166, hta:70.5, sta:73.5, drop:73, cs:426, fc:638,
     standover:822, tire:718, rake:55 },
   { id:'sklarLG', brand:'Sklar', name:'Sklar SuperSomething LG', color:'#4f8fb5', on:true,
-    stack:629, reach:406, ett:592, st:575, ht:187, hta:70.5, sta:73.5, drop:73, cs:426, wb:1085,
+    stack:629, reach:406, ett:592, st:575, ht:187, hta:70.5, sta:73.5, drop:73, cs:426, fc:665,
     standover:850, tire:718, rake:55 },
   { id:'pbjM', brand:'Sklar',   name:'Sklar PBJ M †', color:'#ff6b6b', on:false,
     stack:615, reach:461, ett:637, st:440, ht:110, hta:69, sta:74, drop:68, cs:432, fc:730,
@@ -321,7 +322,7 @@ const DATUM = { barTop:663, barX:489, drop:80, s2b:545, saddleRefX:-50 };
 /* Defaults are Joe's own cockpit — 35 mm of spacers, stem flipped up — so every
    frame is tried with the setup he actually rides. Keep these in step with the
    value attributes on the inputs above. */
-let cock = { spacers:35, overhead:30, stem:90, angle:6 }, saddleY = 743, showWheels = false;
+let cock = { spacers:35, overhead:30, stem:90, angle:6 }, saddleY = 718, inseam = 840, showWheels = false;
 /* clip-on aero bars, same set fitted to every frame: pads above the bar top,
    hands forward of the pads and level with them */
 let aero = { rise:45, ext:200, tilt:10 }, showAero = false;
@@ -396,6 +397,25 @@ function draw(){
     for (let hit = true; hit; ) { hit = false;
       for (const p of placed) if (Math.abs(p.x-x) < 150 && Math.abs(p.y-ny) < 22){ ny += 25; hit = true; break; } }
     placed.push({x,y:ny}); return ny; };
+
+  /* Standover: each frame's published figure as a thick tick over the middle of
+     its top tube, measured up from that frame's own ground line, labelled with
+     the clearance it leaves at the inseam. The inseam itself is one rule, drawn from the average ground
+     of the frames on show, since reference tyres move each ground line a little. */
+  const sFrames = on;
+  const gnd = sFrames.reduce((s,b)=>s+b.bbh,0)/sFrames.length;
+  svg.appendChild(el('line',{x1:X(minX),y1:Y(inseam-gnd),x2:X(maxX),y2:Y(inseam-gnd),stroke:'#5c6873','stroke-width':1,
+    'stroke-dasharray':'2 6','vector-effect':'non-scaling-stroke'}));
+  svg.appendChild(el('text',{x:X(minX)+6,y:Y(inseam-gnd)+28,fill:'#8b98a4','font-size':21,'letter-spacing':1.5,
+    'font-family':'Archivo Narrow, sans-serif','font-weight':700}, 'INSEAM '+inseam));
+  for (const b of sFrames){
+    if (!b.standover) continue;
+    const sy = b.standover - b.bbh, sx = (b.stTop.x + b.htTop.x)/2;
+    poly(svg,[{x:sx,y:-b.bbh},{x:sx,y:sy}],{stroke:b.color,'stroke-width':1,'stroke-dasharray':'2 5',opacity:.4});
+    poly(svg,[{x:sx-50,y:sy},{x:sx+50,y:sy}],{stroke:b.color,'stroke-width':4,opacity:.9});
+    svg.appendChild(el('text',{x:X(sx)+56,y:labelY(X(sx)+56,Y(sy)+8),fill:b.color,'font-size':20,opacity:.9,
+      'font-family':'JetBrains Mono, monospace'}, b.standover+' so · '+sgn(inseam-b.standover)));
+  }
 
   for (const b of on){
     const g = el('g',{}); svg.appendChild(g);
@@ -487,7 +507,7 @@ function tables(){
   document.getElementById('geoRows').innerHTML = on.map(b=>`<tr>${nameCell(b)}
     <td>${n0(b.stack)}</td><td>${n0(b.reach)}</td><td>${b.sr.toFixed(2)}</td><td>${n0(b.ett)}</td>
     <td>${n0(b.st)}</td><td>${b.hta}°</td><td>${b.sta}°</td><td>${b.cs}</td><td>${b.wb}</td>
-    <td>${b.trail.toFixed(1)}</td><td>${b.drop}</td><td>${b.standover ?? '—'}</td></tr>`).join('');
+    <td>${b.trail.toFixed(1)}</td><td>${b.drop}</td><td>${b.standover ?? '—'}</td><td>${b.standover ? sgn(inseam - b.standover) : '—'}</td></tr>`).join('');
   findings();
 }
 
@@ -572,7 +592,7 @@ abn.addEventListener('click',()=>{
   for (const id of ['aeroHead','aeroWrap','aeroNote']) document.getElementById(id).hidden = !showAero;
   render();
 });
-for (const [id,fn] of [['rise',v=>cock.spacers=v],['oh',v=>cock.overhead=v],['stem',v=>cock.stem=v],['sh',v=>saddleY=v],
+for (const [id,fn] of [['rise',v=>cock.spacers=v],['oh',v=>cock.overhead=v],['stem',v=>cock.stem=v],['sh',v=>saddleY=v],['ins',v=>inseam=v],
                        ['apr',v=>aero.rise=v],['aex',v=>aero.ext=v],['atl',v=>aero.tilt=v]])
   document.getElementById(id).addEventListener('input',e=>{
     const v=parseFloat(e.target.value); if(!isNaN(v)){fn(v);render();}});
