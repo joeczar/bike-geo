@@ -462,6 +462,12 @@ model, same solves, so **a geometry or model fix now goes in three files**.
   figures, source unrecorded. XL left blank.
 - Reviews are summarised on the page (Radavist V2 Jul 2026, Bikepacking.com and
   Radavist V1 2023). Every reviewer fitted a shorter stem than stock.
+- **`sklar-build.html`** (Oct 2026) is the parts list for the M-L build, linked
+  from the eyebrow line. Static, no script. Every row links bike24.de or Sklar;
+  prices are bike24's as read 18 Oct 2026 and the page says so. It is a summary
+  of `research/build-list.md`, `research/zipp-303-xplr-s-sklar.md` and
+  `research/zipp-sc-sl-seatpost-sklar.md`, which hold the citations — change a
+  part there first, then the page, and keep the totals summing.
 - State key `bike-geo.sklar.v2` (bumped from v1 so the M-L defaults appear).
 
 ## Adding a frame
