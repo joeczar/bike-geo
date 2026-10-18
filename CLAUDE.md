@@ -1,14 +1,20 @@
 # CLAUDE.md
 
 Static tools comparing gravel/bikepacking framesets by **where they put the
-rider**. Two pages, no build step, no dependencies:
+rider**. Four pages, no build step, no dependencies:
 
-- **`index.html`** — the shortlist. One shared cockpit fitted to every frame, so
+- **`index.html`** — the build (Oct 2026): the parts list for Joe's SuperSomething
+  M-L, the site's landing page. See *The SuperSomething dial-in page* below.
+- **`sklar.html`** — the SuperSomething dial-in, the Tutto against the Sklar.
+- **`shortlist.html`** — the shortlist (was `index.html` until Oct 2026). One shared cockpit fitted to every frame, so
   the numbers isolate the frame. Frame data is the `BIKES` array in the inline
   `<script>`. Everything below describes this page unless it says otherwise.
-- **`terrel.html`** — the dial-in. Two frames only, the Tutto and a Terrel, each
-  with **its own cockpit**, for speccing a build against the bike Joe rides. See
-  *The dial-in page* below.
+- **`terrel.html`** — the Terrel dial-in, the template the SuperSomething page was
+  copied from; Terrel since ruled out, page kept. See *The dial-in page* below.
+
+Every page carries the same top nav (`.sitenav`: Build · Dial-in · Shortlist,
+`aria-current` on the current one). Terrel is deliberately not in it; it is
+reachable by URL. Adding a page means adding it to the nav on all four.
 
 Read this before changing the model. Several things here were arrived at by
 correcting mistakes, and they are easy to reintroduce.
@@ -143,7 +149,7 @@ is not used. Inseam is **840**.
 `saddleY` **675** is the page default on all three pages, in both the `sh`
 input value and the state initialiser, which must stay in step. The SADDLE TOP
 rule is labelled with the along-tube height on the Tutto, rounded to 5 mm (the
-measurement's precision), so it reads 700. The datum panel on `index.html` shows
+measurement's precision), so it reads 700. The datum panel on `shortlist.html` shows
 **Saddle height · Oct 2026: 700**; the rest of that panel — bar 489 / 663, drop
 80, saddle to bar 545 — is still the January datum, and `DATUM` is unchanged.
 On the dial-in pages a stored 743 or 718 is an old untouched default and is
@@ -388,7 +394,7 @@ fine.
 `terrel.html`, added Aug 2026, once Joe had settled on the Terrel. Different job
 from the shortlist: not "which frame", but "what stem and spacers on *this*
 frame". So it holds **two cockpits** — `cockA` for the Tutto, `cockB` for the
-Terrel — where `index.html` holds one shared one plus per-frame overrides.
+Terrel — where `shortlist.html` holds one shared one plus per-frame overrides.
 
 - The geometry rows and the whole `fit()` model are **copied, not imported**.
   That is deliberate for a static page with no build step, and it is the one real
@@ -422,7 +428,7 @@ Terrel — where `index.html` holds one shared one plus per-frame overrides.
   the frame's headset, not to the parts. Panel B also opens on **10 mm of spacers**
   rather than none — a build choice, not a frame fact, because spacers you can
   remove are the only way to lower this bar without shortening hoses.
-  **`index.html` still fits the Terrel with the shared 30**, so its Terrel bar
+  **`shortlist.html` still fits the Terrel with the shared 30**, so its Terrel bar
   figures read about 10 mm low. Fixing that properly means letting a frame carry
   an `overhead` in its `cockpit` override, which cuts against the rule that only
   the reference bike overrides anything — Joe's call, not settled.
@@ -436,7 +442,7 @@ Terrel — where `index.html` holds one shared one plus per-frame overrides.
   `load()` are both wrapped in try/catch so private mode degrades to forgetting
   rather than a blank page; `sync()` drives *every* control from state, so the
   `value` attributes in the HTML are only the pre-JS fallback here — unlike
-  `index.html`, they are not the source of truth. The **Reset** button clears the
+  `shortlist.html`, they are not the source of truth. The **Reset** button clears the
   key and re-saves the defaults. Storage is per-origin, so a `file://` copy and a
   deployed copy keep separate state.
 
@@ -448,7 +454,7 @@ model, same solves, so **a geometry or model fix now goes in three files**.
 
 - Rows are Sklar's current (V2) chart from the frameset page, fetched Oct 2026.
   Sklar print **front centre**, not wheelbase, so the rows carry `fc`; it closes
-  against their 55 mm offset within 1 mm on every size. `index.html` used to
+  against their 55 mm offset within 1 mm on every size. `shortlist.html` used to
   carry `wb` 1058 / 1085, ~4 mm long — corrected to `fc` 638 / 665 there too.
 - Overhead is the shared **30**: full external routing, EC34 top cup, no
   routing cover. Panel B opens on the **M-L** with **0 spacers, 90 mm stem, −6°**
@@ -462,8 +468,8 @@ model, same solves, so **a geometry or model fix now goes in three files**.
   figures, source unrecorded. XL left blank.
 - Reviews are summarised on the page (Radavist V2 Jul 2026, Bikepacking.com and
   Radavist V1 2023). Every reviewer fitted a shorter stem than stock.
-- **`sklar-build.html`** (Oct 2026) is the parts list for the M-L build, linked
-  from the eyebrow line. Static, no script. Every row links bike24.de or Sklar;
+- **`index.html`** (Oct 2026, first written as `sklar-build.html`) is the parts
+  list for the M-L build and the landing page. Static, no script. Every row links bike24.de or Sklar;
   prices are bike24's as read 18 Oct 2026 and the page says so. It is a summary
   of `research/build-list.md`, `research/zipp-303-xplr-s-sklar.md` and
   `research/zipp-sc-sl-seatpost-sklar.md`, which hold the citations — change a

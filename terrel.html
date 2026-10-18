@@ -102,12 +102,18 @@
   table.dial{min-width:600px}
   table.dial td:first-child+td,table.dial th:first-child+th{border-left:1px solid var(--rule)}
   .neg{color:var(--low)}
+  .sitenav{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 22px;padding:0 0 12px;border-bottom:1px solid var(--rule);
+    font-family:'Archivo Narrow',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:11.5px}
+  .sitenav a{color:var(--mute);text-decoration:none;padding:2px 0;border-bottom:2px solid transparent}
+  .sitenav a:hover{color:var(--fg)}
+  .sitenav a[aria-current="page"]{color:var(--fg);border-bottom-color:var(--up)}
 </style>
 
 </head>
 <body>
 <div class="wrap">
-  <p class="eyebrow"><a href="index.html" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)">← the whole shortlist</a> · two bikes, two cockpits, aligned at the bottom bracket</p>
+  <nav class="sitenav" aria-label="Pages"><a href="index.html">Build</a><a href="sklar.html">Dial-in</a><a href="shortlist.html">Shortlist</a></nav>
+  <p class="eyebrow">Two bikes, two cockpits, aligned at the bottom bracket</p>
   <h1>Dialling in the Terrel against the Tutto</h1>
   <p class="lede">The shortlist page fits one shared cockpit to thirty frames, which is what you want when you are still choosing. This one does the opposite: two frames, each with its own stem and spacer stack, so you can spec a Terrel build and see where it puts you relative to the bike you already ride. The Tutto's position is the thing to measure from — it is not a target the Terrel has to hit.</p>
 

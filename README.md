@@ -3,14 +3,16 @@
 Static tools comparing gravel/bikepacking framesets by **where they put the
 rider**. No build step, no dependencies. Fonts load from Google Fonts at runtime.
 
-Two pages:
+Pages, all linked from the top nav:
 
-- **`index.html`** — the shortlist. One shared cockpit (spacers, stem length,
-  stem angle) fitted to every frame, so the numbers isolate the frame rather
-  than the parts. Frame data is the `BIKES` array in the inline `<script>`.
-- **`terrel.html`** — the dial-in. Two frames only, each with its own cockpit,
-  for solving stem and spacers against a build. State persists in
-  `localStorage`.
+- **`index.html`** — the build: every part for the Sklar SuperSomething M-L,
+  with links and prices.
+- **`sklar.html`** — the dial-in. Two frames, each with its own cockpit, for
+  solving stem and spacers against a build. State persists in `localStorage`.
+- **`shortlist.html`** — the shortlist. One shared cockpit (spacers, stem
+  length, stem angle) fitted to every frame, so the numbers isolate the frame
+  rather than the parts. Frame data is the `BIKES` array in the inline `<script>`.
+- **`terrel.html`** — the earlier Terrel dial-in, not in the nav.
 
 Frames are described by signed deltas from a reference position — bar reach and
 saddle-to-bar drop. Nothing is a pass or a fail: a 50 mm drop is what a loaded
